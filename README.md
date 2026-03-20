@@ -18,6 +18,18 @@ India has **10+ million platform-based delivery workers** riding for Zomato, Swi
 
 ---
 
+## 🌐 Live Prototype
+
+> **[quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)**
+
+The Phase 1 prototype demonstrates:
+- Rider onboarding with policy selection
+- Standard Shield (₹49/week) vs EV Shield (₹79/week) tier selection
+- Live weather trigger simulation
+- Automated ₹540 UPI payout demo — zero claim filed
+
+---
+
 ## 🧩 Our Solution: Two-Tier Parametric Insurance
 
 QuantumKnot is a **web-based AI-powered parametric insurance platform** that covers ALL delivery partners — not just one segment. We offer two tiers to serve the broadest possible market while innovating at the premium layer.
@@ -54,7 +66,7 @@ QuantumKnot Platform
 | Coverage | ₹3,500/week income protection |
 | Pain point | Loses 3–4 working days during Hyderabad monsoon flooding |
 
-**Trigger Scenario:** IMD issues a Red Alert for Hyderabad. Rainfall exceeds 35mm/hr. QuantumKnot detects the trigger, cross-checks Ravi's last active GPS zone, calculates 6 lost hours × ₹90/hr = **₹540 auto-paid to his UPI** within 15 minutes. Zero claim needed.
+**Trigger Scenario:** IMD issues a Red Alert for Hyderabad. Rainfall exceeds 35mm/hr. QuantumKnot detects the trigger, cross-checks Ravi's last active GPS zone, calculates 6 lost hours × ₹90/hr = **₹540 auto-paid to his UPI within 15 minutes.** Zero claim needed.
 
 ---
 
@@ -102,7 +114,7 @@ We deliberately chose **weekly pricing** because delivery workers are paid weekl
 
 ### EV Shield Premium — ₹79/week
 | Payout Tier | Disruption Type | Weekly Payout |
-|-------------|----------------|--------------|
+|-------------|----------------|-------------:|
 | Heat Partial | Range drop >25% | ₹400 |
 | Grid Outage | Charging down >4hrs | ₹600 |
 | Compound Event | Heat + Grid + Rain | Up to ₹4,500 |
@@ -119,7 +131,7 @@ The ₹49 and ₹79 are **base rates**. Our ML model adjusts the weekly premium 
 
 ## ⚡ Parametric Triggers
 
-Parametric insurance pays automatically when a measurable external parameter crosses a threshold. No human adjuster. No claim form. Just data → decision → payment.
+Parametric insurance pays automatically when a measurable external parameter crosses a threshold. No human adjuster. No claim form. Just **data → decision → payment.**
 
 ### Standard Shield Triggers
 
@@ -144,7 +156,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ## 🤖 AI/ML Architecture
 
 ### 1. Dynamic Premium Calculation (Pre-Policy)
-**Model:** Gradient Boosted Trees (XGBoost)  
+**Model:** Gradient Boosted Trees (XGBoost)
 **Features:**
 - Zone-level historical disruption frequency (last 12 months)
 - Seasonal risk multiplier (monsoon, summer heatwave months)
@@ -155,7 +167,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 **Output:** Personalized weekly premium with explainable adjustment breakdown shown to rider at signup.
 
 ### 2. Claim Trigger Validation (Real-Time)
-**Model:** Rule-based engine + anomaly scoring  
+**Model:** Rule-based engine + anomaly scoring
 **Process:**
 1. External API fires a potential trigger event
 2. Rules engine checks if threshold is breached
@@ -163,7 +175,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 4. If yes → claim auto-initiated, payout calculated, sent to payment gateway
 
 ### 3. Fraud Detection (Anomaly Detection)
-**Model:** Isolation Forest + Rule-based flags  
+**Model:** Isolation Forest + Rule-based flags
 **Detection patterns:**
 - Rider claims disruption but GPS shows active movement during event window → **flag**
 - EV rider claims heat-battery trigger but temperature data shows 32°C, not 42°C → **flag**
@@ -215,7 +227,8 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ### Hosting
 | Service | Platform |
 |---------|---------|
-| Frontend | Vercel (free tier) |
+| Frontend Prototype | Base44 (quantum-knot-shield.base44.app) |
+| Frontend (Phase 2+) | Vercel (free tier) |
 | Backend | Railway / Render (free tier) |
 | DB | Supabase (free tier) |
 | ML Models | Hugging Face Spaces / Railway |
@@ -227,17 +240,18 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ### Phase 1 (Seed) — March 4–20: Ideation & Foundation ✅
 - [x] Repository setup
 - [x] README and core documentation
-- [ ] UI wireframes and component scaffolding
-- [ ] Basic onboarding flow (web)
-- [ ] Mock API integrations for weather and AQI
-- [ ] 2-minute prototype video
+- [x] Adversarial defense & anti-spoofing strategy (Market Crash response)
+- [x] Live prototype deployed on Base44
+- [x] Onboarding flow with policy selection (Standard Shield vs EV Shield)
+- [x] Auto-payout trigger simulation demo
+- [x] 2-minute demo video
 
 ### Phase 2 (Scale) — March 21 – April 4: Automation & Protection
 - [ ] Registration and profile flow (complete)
 - [ ] Policy creation with dynamic weekly premium calculation
 - [ ] 5 parametric trigger automations (live API + mock)
 - [ ] Claims management module
-- [ ] EV Shield tier implementation
+- [ ] EV Shield tier full implementation
 - [ ] Basic ML premium model (trained on synthetic data)
 
 ### Phase 3 (Soar) — April 5–17: Scale & Optimise
@@ -297,6 +311,104 @@ QuantumKnot/
 
 ---
 
+## 🛡️ Adversarial Defense & Anti-Spoofing Strategy
+### Market Crash Response: Operation Fraud Ring Takedown
+
+---
+
+### The Attack We're Defending Against
+
+A coordinated fraud ring is exploiting parametric triggers by:
+- **GPS Spoofing** — faking location to appear in a disrupted zone while actually working normally elsewhere
+- **Synthetic Disruption Claims** — filing claims during real weather events but from unaffected zones
+- **Ring Coordination** — 500+ riders filing identical claims within seconds of each other
+- **Ghost Riders** — fake accounts created purely to collect payouts during disruption events
+
+---
+
+### Our 4-Layer Defense Architecture
+
+#### Layer 1 — GPS Authenticity Verification
+**Problem:** Rider claims to be in flood-affected Zone A but is actually in Zone C working normally.
+
+**How we catch it:**
+- Cross-reference claimed GPS location against **platform order history** — if the rider completed deliveries during the "disruption window," the claim is auto-rejected
+- Compare GPS altitude + speed data patterns — a spoofed location shows 0 km/h with zero movement variance; a genuinely stranded rider shows micro-movements (shifting, walking to shelter)
+- **Cell tower triangulation cross-check** — GPS coordinates must match the cell tower the rider's device is pinging within a 200m radius
+- EV Shield specific: If rider claims heat-battery failure, check if charging station API shows the rider's registered vehicle attempting a charge during that window — a truly stranded rider won't show a charge attempt
+
+**Decision:** GPS + platform activity + cell tower contradiction → fraud score +60 → hold for review
+
+---
+
+#### Layer 2 — Fraud Ring Pattern Detection
+**Problem:** 500 riders submit identical claims within 90 seconds of a trigger event.
+
+**How we catch it:**
+- **Velocity check** — more than 15 claims from the same 2km² zone within 60 seconds activates ring-detection flag
+- **Claim template fingerprinting** — if claim metadata (device model, submission time pattern, network IP range) shows statistical clustering, the entire batch is flagged
+- **Social graph analysis** — flagged riders sharing referral codes, onboarding timestamps within 48 hours of each other, or identical UPI bank IFSCs spikes the ring probability score
+- **Historical baseline comparison** — a zone that normally generates 8 claims per disruption event suddenly generating 200 triggers a manual review gate
+
+**Decision:** Ring probability score > 75 → entire cluster frozen, individual reviews initiated, payouts held 24 hours
+
+---
+
+#### Layer 3 — Genuine Stranded Worker Protection
+**The hardest problem:** How do we catch fraudsters without punishing honest workers?
+
+**Our rules:**
+- Riders with **6+ months of clean claim history** get a "Trusted Rider" badge — their claims auto-approve even if zone velocity is high
+- First-time claims during genuinely catastrophic events (IMD Red Alert, NDMA flood declaration) get **automatic provisional payout of 50% immediately** — the remaining 50% releases after 24-hour verification. Honest rider gets money fast. Fraudster gets half and faces investigation.
+- **Human appeal layer** — any auto-rejected claim can be appealed with a 30-second video of surroundings. Our AI vision model checks if the environment matches the claimed disruption (flooded street, visible rain, stationary vehicle)
+- Riders in the system 3+ months with no prior flags are never fully blocked — worst case is a 24-hour hold, never permanent denial
+
+---
+
+#### Layer 4 — Real-Time Fraud Score Engine
+Every claim generates a **Fraud Score (0–100)** computed from:
+
+| Signal | Weight | Fraud Indicator |
+|--------|--------|----------------|
+| GPS vs platform activity match | 25% | Mismatch = high fraud |
+| Claim velocity in zone | 20% | Spike = high fraud |
+| Rider tenure & history | 20% | New account = higher risk |
+| Device fingerprint cluster | 15% | Shared device = high fraud |
+| Cell tower vs GPS match | 10% | Mismatch = high fraud |
+| EV charging station cross-ref | 10% | Active charge = fraud flag |
+
+**Score thresholds:**
+
+| Score | Action |
+|-------|--------|
+| 0–40 | Auto-approve, full payout |
+| 41–69 | Approve with monitoring flag |
+| 70–84 | Provisional 50% payout, 24hr review |
+| 85–100 | Hold all payout, manual investigation, rider notified |
+
+---
+
+### Why Our System Doesn't Punish Honest Workers
+
+The key insight: **fraudsters act in clusters. Genuine workers act alone.**
+
+A real stranded rider in Hyderabad during a flood:
+- Location matches the flood zone ✅
+- No platform deliveries during the event ✅
+- Normal GPS movement variance — not perfectly stationary ✅
+- NOT part of a 500-person simultaneous claim cluster ✅
+- Prior clean history ✅
+
+A fraud ring member:
+- Perfect GPS coordinates — too perfect, zero variance ❌
+- Platform activity shows they were actively working ❌
+- Filed within seconds of 200 others from the same IP range ❌
+- Created account within 48 hours of other ring members ❌
+
+Our system scores the **combination** of signals — not any single one. A new rider during a genuine Red Alert still gets their 50% provisional payout. **We never leave a genuinely stranded worker empty-handed.**
+
+---
+
 ## 👨‍💻 Team
 
 **QuantumKnot** | Guidewire DEVTrails 2026
@@ -305,8 +417,8 @@ QuantumKnot/
 
 ## 📎 Links
 
-- 🎥 Demo Video: *(to be added by March 20)*
-- 🌐 Live App: *(to be added in Phase 2)*
+- 🎥 Demo Video: *(add YouTube link here)*
+- 🌐 Live Prototype: [quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)
 - 📄 Pitch Deck: *(to be added in Phase 3)*
 
 ---
