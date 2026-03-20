@@ -1,5 +1,6 @@
-# QuantumKnot ⚡🛡️
+# TriggrPay ⚡🛡️
 ### AI-Powered Parametric Income Insurance for India's Gig Delivery Workers
+> *"Your disruption is our trigger. Your payout is automatic."*
 > Built for **Guidewire DEVTrails 2026** | Team: QuantumKnot
 
 [![Phase](https://img.shields.io/badge/Phase-1%20Seed-yellow)](https://github.com/mounishsanku/QuantumKnot)
@@ -14,7 +15,7 @@ India has **10+ million platform-based delivery workers** riding for Zomato, Swi
 
 > *"Arjun rides an EV for Zepto in Hyderabad. In May, when temperatures hit 44°C, his bike's battery range drops from 80km to 55km — not enough to complete his shift. He loses ₹800 that day. Then the next day too. By week's end, he's lost ₹3,200 with zero recourse."*
 
-**QuantumKnot changes this.** We automatically detect the disruption, calculate the income loss, and pay Arjun before he even thinks of filing a claim.
+**TriggrPay changes this.** We automatically detect the disruption, calculate the income loss, and pay Arjun before he even thinks of filing a claim.
 
 ---
 
@@ -32,10 +33,10 @@ The Phase 1 prototype demonstrates:
 
 ## 🧩 Our Solution: Two-Tier Parametric Insurance
 
-QuantumKnot is a **web-based AI-powered parametric insurance platform** that covers ALL delivery partners — not just one segment. We offer two tiers to serve the broadest possible market while innovating at the premium layer.
+TriggrPay is a **web-based AI-powered parametric insurance platform** that covers ALL delivery partners — not just one segment. We offer two tiers to serve the broadest possible market while innovating at the premium layer.
 
 ```
-QuantumKnot Platform
+TriggrPay Platform
 │
 ├── 🟢 Standard Shield (₹49/week)
 │   → For ALL delivery riders: Food, Grocery, E-commerce
@@ -66,7 +67,7 @@ QuantumKnot Platform
 | Coverage | ₹3,500/week income protection |
 | Pain point | Loses 3–4 working days during Hyderabad monsoon flooding |
 
-**Trigger Scenario:** IMD issues a Red Alert for Hyderabad. Rainfall exceeds 35mm/hr. QuantumKnot detects the trigger, cross-checks Ravi's last active GPS zone, calculates 6 lost hours × ₹90/hr = **₹540 auto-paid to his UPI within 15 minutes.** Zero claim needed.
+**Trigger Scenario:** IMD issues a Red Alert for Hyderabad. Rainfall exceeds 35mm/hr. TriggrPay detects the trigger, cross-checks Ravi's last active GPS zone, calculates 6 lost hours × ₹90/hr = **₹540 auto-paid to his UPI within 15 minutes.** Zero claim needed.
 
 ---
 
@@ -81,7 +82,7 @@ QuantumKnot Platform
 | Coverage | ₹3,000/week income protection |
 | Pain point | AQI-related advisories and bandhs in Bengaluru shut her zone |
 
-**Trigger Scenario:** BBMP announces sudden micro-zone shutdown in Koramangala due to civic unrest. QuantumKnot detects zone closure via geofencing + news API, validates Meena was scheduled to work that zone, and auto-triggers a proportional payout.
+**Trigger Scenario:** BBMP announces sudden micro-zone shutdown in Koramangala due to civic unrest. TriggrPay detects zone closure via geofencing + news API, validates Meena was scheduled to work that zone, and auto-triggers a proportional payout.
 
 ---
 
@@ -282,7 +283,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ## 📁 Repository Structure (Planned)
 
 ```
-QuantumKnot/
+TriggrPay/
 ├── frontend/               # Next.js React app
 │   ├── components/         # UI components
 │   ├── pages/              # App routes
@@ -322,7 +323,7 @@ QuantumKnot/
 
 ## 🚀 Go-To-Market Strategy
 
-QuantumKnot will **not** compete with platforms for rider relationships. Instead we go around them through three phases:
+TriggrPay will **not** compete with platforms for rider relationships. Instead we go around them through three phases:
 
 ### Phase 1 — EV Fleet Partnerships
 Partner directly with **Zypp Electric** and **Euler Motors** who manage 50,000+ EV riders and desperately need welfare products for rider retention. We are their insurance layer — not a competitor. They distribute us, we protect their riders.
@@ -331,13 +332,13 @@ Partner directly with **Zypp Electric** and **Euler Motors** who manage 50,000+ 
 **IFAT** (Indian Federation of App-based Transport Workers) represents 200,000+ gig workers and actively seeks financial protection products for members. One partnership = instant access to a large captive audience who already trust the union.
 
 ### Phase 3 — Regulatory Path
-Operate under the **IRDAI Regulatory Sandbox framework (2019)** as a parametric protection product — not traditional insurance. Partner with a licensed insurer (New India Assurance, HDFC Ergo) as underwriter while QuantumKnot provides the AI and tech layer. This is the exact model used by Acko and Digit when they launched.
+Operate under the **IRDAI Regulatory Sandbox framework (2019)** as a parametric protection product — not traditional insurance. Partner with a licensed insurer (New India Assurance, HDFC Ergo) as underwriter while TriggrPay provides the AI and tech layer. This is the exact model used by Acko and Digit when they launched.
 
 ### Why Platforms Won't Just Copy Us
 - Building parametric AI + fraud detection is a 12–18 month engineering effort
 - Platforms are not in the insurance business — regulation is a barrier for them
 - We can white-label our product TO platforms as a worker welfare benefit
-- "Powered by QuantumKnot" on Zomato's app = distribution at zero cost to us
+- "Powered by TriggrPay" on Zomato's app = distribution at zero cost to us
 
 ---
 
@@ -346,14 +347,14 @@ Operate under the **IRDAI Regulatory Sandbox framework (2019)** as a parametric 
 ### The Core Insight: Parametric Changes Everything
 
 Traditional insurers are profitable by **delaying and denying** claims.
-QuantumKnot is profitable by **automating and trusting data.**
+TriggrPay is profitable by **automating and trusting data.**
 These are fundamentally different business models — and ours is better for both the worker AND the company.
 
 ---
 
 ### 🧑‍🤝‍🧑 The Worker's Side
 
-| Problem with Traditional Insurance | How QuantumKnot Fixes It |
+| Problem with Traditional Insurance | How TriggrPay Fixes It |
 |------------------------------------|--------------------------|
 | Fill long claim forms | Zero forms — event is the claim |
 | Wait 30–90 days for payout | ₹540 in 15 minutes via UPI |
@@ -390,7 +391,7 @@ Meaning: For every ₹100 collected → max ₹65 paid out
 Remaining ₹35 → operations, AI infrastructure, profit
 
 A traditional insurer runs 85–95% loss ratio (barely profitable)
-QuantumKnot targets 55–65% because:
+TriggrPay targets 55–65% because:
 → Zero claim adjustment cost (APIs replace human adjusters)
 → Fraud detection eliminates ~15% false claims automatically
 → Parametric triggers prevent subjective over-claiming
@@ -405,7 +406,7 @@ Traditional Insurer Cost Per Claim:
 ├── Paperwork processing:     ₹200–400 per claim
 └── Total:                    ₹1,000–1,600 per claim processed
 
-QuantumKnot Cost Per Claim:
+TriggrPay Cost Per Claim:
 ├── API call (weather check): ₹0.002
 ├── GPS validation query:     ₹0.001
 ├── Fraud score computation:  ₹0.008
@@ -414,12 +415,10 @@ QuantumKnot Cost Per Claim:
 
 #### Step 4 — Basis Risk is Our Profitability Cushion
 
-Basis risk means the data threshold may not perfectly match every rider's real situation. This works in our favour financially.
-
 ```
 IMD reports: 18mm/hr rainfall (threshold: 20mm/hr)
 Some riders genuinely couldn't work → but threshold not met
-QuantumKnot: No payout triggered
+TriggrPay: No payout triggered
 
 This is not unfair — it's transparent and agreed upfront.
 The rider knew the threshold when they signed up.
@@ -428,12 +427,10 @@ This predictability is what makes the model sustainable.
 
 #### Step 5 — Reinsurance for Catastrophic Events
 
-When a cyclone hits and ALL riders are affected simultaneously (correlated risk), QuantumKnot hedges through reinsurance.
-
 ```
-QuantumKnot collects:   ₹49,000/week from Hyderabad riders
-QuantumKnot pays:       ~₹4,900/week to reinsurer (10% of premium)
-In return:              Reinsurer covers payouts above ₹2,00,000 per event
+TriggrPay collects:   ₹49,000/week from Hyderabad riders
+TriggrPay pays:       ~₹4,900/week to reinsurer (10% of premium)
+In return:            Reinsurer covers payouts above ₹2,00,000 per event
 
 This is how Pula (Africa), Arbol, and FloodFlash operate globally.
 Same model. Proven profitable.
@@ -468,9 +465,6 @@ API + infrastructure cost:  ₹5/week
 Reinsurance cost:           ₹8/week
 ────────────────────────────────────────
 Net contribution margin:    ₹17/week per rider ✅
-
-Higher margin because EV data (charging stations, battery sensors)
-makes fraud detection significantly more accurate.
 ```
 
 ---
@@ -485,7 +479,7 @@ makes fraud detection significantly more accurate.
 | **IFFCO-Tokio** | Parametric crop insurance in India | Government-backed, scaled nationally |
 | **Nuo** | Gig worker income protection (Southeast Asia) | Series A funded |
 
-> QuantumKnot brings this proven global model to India's 10M+ gig delivery workers — a segment with **zero existing parametric coverage.**
+> TriggrPay brings this proven global model to India's 10M+ gig delivery workers — a segment with **zero existing parametric coverage.**
 
 ---
 
@@ -552,8 +546,8 @@ A coordinated fraud ring is exploiting parametric triggers by:
 
 **Our rules:**
 - Riders with **6+ months of clean claim history** get a "Trusted Rider" badge — their claims auto-approve even if zone velocity is high
-- First-time claims during genuinely catastrophic events (IMD Red Alert, NDMA flood declaration) get **automatic provisional payout of 50% immediately** — the remaining 50% releases after 24-hour verification. Honest rider gets money fast. Fraudster gets half and faces investigation.
-- **Human appeal layer** — any auto-rejected claim can be appealed with a 30-second video of surroundings. Our AI vision model checks if the environment matches the claimed disruption (flooded street, visible rain, stationary vehicle)
+- First-time claims during genuinely catastrophic events (IMD Red Alert, NDMA flood declaration) get **automatic provisional payout of 50% immediately** — the remaining 50% releases after 24-hour verification
+- **Human appeal layer** — any auto-rejected claim can be appealed with a 30-second video of surroundings. Our AI vision model checks if the environment matches the claimed disruption
 - Riders in the system 3+ months with no prior flags are never fully blocked — worst case is a 24-hour hold, never permanent denial
 
 ---
@@ -617,4 +611,4 @@ Our system scores the **combination** of signals — not any single one. A new r
 
 ---
 
-*Built with ❤️ for India's gig economy workers. QuantumKnot — because every rupee earned deserves protection.*
+*Built with ❤️ for India's gig economy workers. TriggrPay — because the disruption triggers the pay.*
