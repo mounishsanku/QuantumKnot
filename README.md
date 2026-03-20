@@ -105,6 +105,7 @@ QuantumKnot Platform
 We deliberately chose **weekly pricing** because delivery workers are paid weekly by platforms. Insurance must match their cash flow cycle.
 
 ### Standard Shield — ₹49/week
+
 | Payout Tier | Disruption Duration | Weekly Payout |
 |-------------|--------------------|--------------:|
 | Partial | 2–4 hours lost | ₹350 |
@@ -113,6 +114,7 @@ We deliberately chose **weekly pricing** because delivery workers are paid weekl
 | Multi-Day | 2+ days lost | Up to ₹3,500 |
 
 ### EV Shield Premium — ₹79/week
+
 | Payout Tier | Disruption Type | Weekly Payout |
 |-------------|----------------|-------------:|
 | Heat Partial | Range drop >25% | ₹400 |
@@ -120,6 +122,7 @@ We deliberately chose **weekly pricing** because delivery workers are paid weekl
 | Compound Event | Heat + Grid + Rain | Up to ₹4,500 |
 
 ### AI-Driven Dynamic Pricing Factors
+
 The ₹49 and ₹79 are **base rates**. Our ML model adjusts the weekly premium up/down based on:
 - Historical disruption frequency in the rider's operating zone
 - Season (monsoon = higher risk adjustment)
@@ -156,7 +159,9 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ## 🤖 AI/ML Architecture
 
 ### 1. Dynamic Premium Calculation (Pre-Policy)
+
 **Model:** Gradient Boosted Trees (XGBoost)
+
 **Features:**
 - Zone-level historical disruption frequency (last 12 months)
 - Seasonal risk multiplier (monsoon, summer heatwave months)
@@ -167,7 +172,9 @@ Parametric insurance pays automatically when a measurable external parameter cro
 **Output:** Personalized weekly premium with explainable adjustment breakdown shown to rider at signup.
 
 ### 2. Claim Trigger Validation (Real-Time)
+
 **Model:** Rule-based engine + anomaly scoring
+
 **Process:**
 1. External API fires a potential trigger event
 2. Rules engine checks if threshold is breached
@@ -175,7 +182,9 @@ Parametric insurance pays automatically when a measurable external parameter cro
 4. If yes → claim auto-initiated, payout calculated, sent to payment gateway
 
 ### 3. Fraud Detection (Anomaly Detection)
+
 **Model:** Isolation Forest + Rule-based flags
+
 **Detection patterns:**
 - Rider claims disruption but GPS shows active movement during event window → **flag**
 - EV rider claims heat-battery trigger but temperature data shows 32°C, not 42°C → **flag**
@@ -190,6 +199,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 ## 🏗️ Tech Stack
 
 ### Frontend
+
 | Layer | Technology | Reason |
 |-------|-----------|--------|
 | Framework | React + Next.js | SSR for fast load on mobile networks |
@@ -198,6 +208,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 | Maps/Geo | Leaflet.js | Zone visualization, free tier |
 
 ### Backend
+
 | Layer | Technology | Reason |
 |-------|-----------|--------|
 | API Server | FastAPI (Python) | ML-native, fast async |
@@ -206,6 +217,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 | Queue | Redis | Trigger event processing pipeline |
 
 ### AI/ML
+
 | Component | Technology |
 |-----------|-----------|
 | Premium Model | XGBoost (scikit-learn) |
@@ -214,6 +226,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 | Model Serving | FastAPI ML endpoints |
 
 ### Integrations
+
 | Integration | API / Tool | Tier |
 |------------|-----------|------|
 | Weather | OpenWeatherMap API | Free tier |
@@ -225,6 +238,7 @@ Parametric insurance pays automatically when a measurable external parameter cro
 | Payments | Razorpay Test Mode | Sandbox |
 
 ### Hosting
+
 | Service | Platform |
 |---------|---------|
 | Frontend Prototype | Base44 (quantum-knot-shield.base44.app) |
@@ -302,12 +316,188 @@ QuantumKnot/
 | EV delivery segment growth | 40% YoY (2024–2026) |
 | Average weekly premium | ₹49–79 |
 | Break-even loss ratio target | <65% |
-| Distribution channel | Direct through delivery platform SDKs |
+| Distribution channel | EV fleet partnerships + rider unions |
 
-**Why this works financially:**
-- Parametric model eliminates loss adjustment costs (no adjusters, no paperwork)
-- Weekly churn is lower than monthly (aligns with pay cycle)
-- EV tier commands premium pricing with better fraud detectability (verifiable sensor data)
+---
+
+## 🚀 Go-To-Market Strategy
+
+QuantumKnot will **not** compete with platforms for rider relationships. Instead we go around them through three phases:
+
+### Phase 1 — EV Fleet Partnerships
+Partner directly with **Zypp Electric** and **Euler Motors** who manage 50,000+ EV riders and desperately need welfare products for rider retention. We are their insurance layer — not a competitor. They distribute us, we protect their riders.
+
+### Phase 2 — Rider Union Distribution
+**IFAT** (Indian Federation of App-based Transport Workers) represents 200,000+ gig workers and actively seeks financial protection products for members. One partnership = instant access to a large captive audience who already trust the union.
+
+### Phase 3 — Regulatory Path
+Operate under the **IRDAI Regulatory Sandbox framework (2019)** as a parametric protection product — not traditional insurance. Partner with a licensed insurer (New India Assurance, HDFC Ergo) as underwriter while QuantumKnot provides the AI and tech layer. This is the exact model used by Acko and Digit when they launched.
+
+### Why Platforms Won't Just Copy Us
+- Building parametric AI + fraud detection is a 12–18 month engineering effort
+- Platforms are not in the insurance business — regulation is a barrier for them
+- We can white-label our product TO platforms as a worker welfare benefit
+- "Powered by QuantumKnot" on Zomato's app = distribution at zero cost to us
+
+---
+
+## 💼 Business Economics — How Everyone Wins
+
+### The Core Insight: Parametric Changes Everything
+
+Traditional insurers are profitable by **delaying and denying** claims.
+QuantumKnot is profitable by **automating and trusting data.**
+These are fundamentally different business models — and ours is better for both the worker AND the company.
+
+---
+
+### 🧑‍🤝‍🧑 The Worker's Side
+
+| Problem with Traditional Insurance | How QuantumKnot Fixes It |
+|------------------------------------|--------------------------|
+| Fill long claim forms | Zero forms — event is the claim |
+| Wait 30–90 days for payout | ₹540 in 15 minutes via UPI |
+| Claims get rejected arbitrarily | If threshold met, payout is guaranteed |
+| Complex policy language | One number: ₹49/week. One promise: we pay when disruption hits |
+| No help during worst moments | Payout arrives BEFORE the worker even realizes they should claim |
+
+> The worker never fights the system. The data fights for them.
+
+---
+
+### 🏢 The Company's Side
+
+#### Step 1 — Risk Pooling
+
+We collect premiums from ALL riders but only pay riders in the AFFECTED zone during a disruption.
+
+```
+Example — Hyderabad, any given week:
+├── 1,000 riders paying ₹49/week = ₹49,000 premium collected
+├── Heavy rain hits 120 riders in Zone A
+├── Payout: 120 × ₹540 = ₹64,800
+└── Calm weeks (3 out of 4): same ₹49,000 collected, near zero payouts
+    Monthly average: ₹1,96,000 collected vs ₹64,800 payout = 33% loss ratio ✅
+```
+
+#### Step 2 — The Loss Ratio Target
+
+```
+Loss Ratio = Total Payouts ÷ Total Premiums
+
+Target: < 65%
+Meaning: For every ₹100 collected → max ₹65 paid out
+Remaining ₹35 → operations, AI infrastructure, profit
+
+A traditional insurer runs 85–95% loss ratio (barely profitable)
+QuantumKnot targets 55–65% because:
+→ Zero claim adjustment cost (APIs replace human adjusters)
+→ Fraud detection eliminates ~15% false claims automatically
+→ Parametric triggers prevent subjective over-claiming
+```
+
+#### Step 3 — AI Reduces Operational Cost to Near Zero
+
+```
+Traditional Insurer Cost Per Claim:
+├── Human adjuster salary:    ₹800–1,200 per claim
+├── Investigation time:       15–45 days
+├── Paperwork processing:     ₹200–400 per claim
+└── Total:                    ₹1,000–1,600 per claim processed
+
+QuantumKnot Cost Per Claim:
+├── API call (weather check): ₹0.002
+├── GPS validation query:     ₹0.001
+├── Fraud score computation:  ₹0.008
+└── Total:                    < ₹1 per claim processed ✅
+```
+
+#### Step 4 — Basis Risk is Our Profitability Cushion
+
+Basis risk means the data threshold may not perfectly match every rider's real situation. This works in our favour financially.
+
+```
+IMD reports: 18mm/hr rainfall (threshold: 20mm/hr)
+Some riders genuinely couldn't work → but threshold not met
+QuantumKnot: No payout triggered
+
+This is not unfair — it's transparent and agreed upfront.
+The rider knew the threshold when they signed up.
+This predictability is what makes the model sustainable.
+```
+
+#### Step 5 — Reinsurance for Catastrophic Events
+
+When a cyclone hits and ALL riders are affected simultaneously (correlated risk), QuantumKnot hedges through reinsurance.
+
+```
+QuantumKnot collects:   ₹49,000/week from Hyderabad riders
+QuantumKnot pays:       ~₹4,900/week to reinsurer (10% of premium)
+In return:              Reinsurer covers payouts above ₹2,00,000 per event
+
+This is how Pula (Africa), Arbol, and FloodFlash operate globally.
+Same model. Proven profitable.
+```
+
+---
+
+### 📊 Unit Economics Per Rider (Weekly)
+
+#### Standard Shield Rider
+
+```
+Premium collected:          ₹49/week
+Expected payout cost:       ₹28/week (actuarial avg, ~4 disruptions/year)
+Fraud detection savings:    ₹4/week  (15% false claim prevention)
+API + infrastructure cost:  ₹3/week
+Reinsurance cost:           ₹5/week
+────────────────────────────────────────
+Net contribution margin:    ₹13/week per rider ✅
+
+At 10,000 riders:    ₹1,30,000/week profit
+At 1,00,000 riders:  ₹13,00,000/week profit
+```
+
+#### EV Shield Rider
+
+```
+Premium collected:          ₹79/week
+Expected payout cost:       ₹42/week (higher risk, EV-specific events)
+Fraud detection savings:    ₹7/week  (EV sensor data = better verification)
+API + infrastructure cost:  ₹5/week
+Reinsurance cost:           ₹8/week
+────────────────────────────────────────
+Net contribution margin:    ₹17/week per rider ✅
+
+Higher margin because EV data (charging stations, battery sensors)
+makes fraud detection significantly more accurate.
+```
+
+---
+
+### 🌍 Comparable Global Models Proving This Works
+
+| Company | Model | Result |
+|---------|-------|--------|
+| **Pula** (Africa) | Parametric crop insurance for smallholder farmers | $70M raised, 15M farmers covered |
+| **Arbol** | Weather parametric for agricultural businesses | Profitable, 30+ countries |
+| **FloodFlash** | Sensor-triggered instant flood payout | Growing 200% YoY in UK |
+| **IFFCO-Tokio** | Parametric crop insurance in India | Government-backed, scaled nationally |
+| **Nuo** | Gig worker income protection (Southeast Asia) | Series A funded |
+
+> QuantumKnot brings this proven global model to India's 10M+ gig delivery workers — a segment with **zero existing parametric coverage.**
+
+---
+
+### The Bottom Line
+
+| | Worker | Company |
+|---|---|---|
+| **Gets** | Instant payout. No forms. No rejection. Weekly pricing. | Low cost. Data-driven payouts. Fraud-proof. Scalable margins. |
+| **How** | Event is the claim. UPI in 15 mins. | APIs replace adjusters. Reinsurance covers catastrophes. |
+| **Result** | Financial safety net that actually works | Profitable at 55–65% loss ratio |
+
+> This is not charity. This is smart insurance.
 
 ---
 
@@ -329,6 +519,7 @@ A coordinated fraud ring is exploiting parametric triggers by:
 ### Our 4-Layer Defense Architecture
 
 #### Layer 1 — GPS Authenticity Verification
+
 **Problem:** Rider claims to be in flood-affected Zone A but is actually in Zone C working normally.
 
 **How we catch it:**
@@ -342,6 +533,7 @@ A coordinated fraud ring is exploiting parametric triggers by:
 ---
 
 #### Layer 2 — Fraud Ring Pattern Detection
+
 **Problem:** 500 riders submit identical claims within 90 seconds of a trigger event.
 
 **How we catch it:**
@@ -355,6 +547,7 @@ A coordinated fraud ring is exploiting parametric triggers by:
 ---
 
 #### Layer 3 — Genuine Stranded Worker Protection
+
 **The hardest problem:** How do we catch fraudsters without punishing honest workers?
 
 **Our rules:**
@@ -366,6 +559,7 @@ A coordinated fraud ring is exploiting parametric triggers by:
 ---
 
 #### Layer 4 — Real-Time Fraud Score Engine
+
 Every claim generates a **Fraud Score (0–100)** computed from:
 
 | Signal | Weight | Fraud Indicator |
@@ -417,7 +611,7 @@ Our system scores the **combination** of signals — not any single one. A new r
 
 ## 📎 Links
 
-- 🎥 Demo Video: *(add YouTube link here)*
+- 🎥 Demo Video: *(add your YouTube link here)*
 - 🌐 Live Prototype: [quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)
 - 📄 Pitch Deck: *(to be added in Phase 3)*
 
