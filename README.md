@@ -1,614 +1,179 @@
 # TriggrPay ⚡🛡️
 ### AI-Powered Parametric Income Insurance for India's Gig Delivery Workers
 > *"Your disruption is our trigger. Your payout is automatic."*
-> Built for **Guidewire DEVTrails 2026** | Team: QuantumKnot
+> **Guidewire DEVTrails 2026** | Team: QuantumKnot
 
 [![Phase](https://img.shields.io/badge/Phase-1%20Seed-yellow)](https://github.com/mounishsanku/QuantumKnot)
 [![Status](https://img.shields.io/badge/Status-Active-green)](https://github.com/mounishsanku/QuantumKnot)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![Live](https://img.shields.io/badge/Prototype-Live-brightgreen)](https://quantum-knot-shield.base44.app)
 
 ---
 
-## 🎯 The Problem We're Solving
+## 🎯 Problem
 
-India has **10+ million platform-based delivery workers** riding for Zomato, Swiggy, Zepto, Blinkit, Amazon, and Flipkart. When external disruptions hit — extreme rain, heat waves, AQI emergencies, sudden curfews — these workers simply stop earning. No warning. No protection. No safety net.
+India's **10M+ gig delivery workers** lose 20–30% of weekly income when disruptions hit — rain, heat waves, AQI alerts, curfews. No warning. No protection. No safety net. Traditional insurance doesn't work for them — wrong pricing cycle, wrong claim process, wrong product entirely.
 
-> *"Arjun rides an EV for Zepto in Hyderabad. In May, when temperatures hit 44°C, his bike's battery range drops from 80km to 55km — not enough to complete his shift. He loses ₹800 that day. Then the next day too. By week's end, he's lost ₹3,200 with zero recourse."*
-
-**TriggrPay changes this.** We automatically detect the disruption, calculate the income loss, and pay Arjun before he even thinks of filing a claim.
+> *Arjun, a Zypp EV rider in Hyderabad, loses ₹3,200 in a week when 44°C heat drops his battery range below viable threshold. He files nothing. Nobody pays him back.*
 
 ---
 
-## 🌐 Live Prototype
+## 💡 Solution
 
-> **[quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)**
-
-The Phase 1 prototype demonstrates:
-- Rider onboarding with policy selection
-- Standard Shield (₹49/week) vs EV Shield (₹79/week) tier selection
-- Live weather trigger simulation
-- Automated ₹540 UPI payout demo — zero claim filed
+**TriggrPay** is parametric income insurance where **the event is the claim.** When a disruption threshold is breached, our AI detects it, validates the rider's zone, scores fraud risk, and sends UPI payout — in under 15 minutes. Zero forms. Zero waiting.
 
 ---
 
-## 🧩 Our Solution: Two-Tier Parametric Insurance
+## 🧩 Coverage Tiers
 
-TriggrPay is a **web-based AI-powered parametric insurance platform** that covers ALL delivery partners — not just one segment. We offer two tiers to serve the broadest possible market while innovating at the premium layer.
+| | 🟢 Standard Shield | ⚡ EV Shield Premium |
+|---|---|---|
+| **Price** | ₹49/week | ₹79/week |
+| **For** | All delivery riders | EV riders only |
+| **Covers** | Rain, floods, AQI, curfews, zone closures | Everything + extreme heat, grid outages, charging infra failure |
+| **Max Payout** | ₹3,500/week | ₹4,500/week |
 
-```
-TriggrPay Platform
-│
-├── 🟢 Standard Shield (₹49/week)
-│   → For ALL delivery riders: Food, Grocery, E-commerce
-│   → Covers: Heavy rain, floods, AQI alerts, curfews, zone closures
-│   → Auto-payout when triggers breach defined thresholds
-│
-└── ⚡ EV Shield Premium (₹79/week)
-    → Exclusively for EV-powered delivery riders (Zypp, Rapido EV, own EVs)
-    → Covers everything in Standard PLUS:
-       → Extreme heat (battery range degradation threshold)
-       → Power grid outages (charging infra down)
-       → EV-specific microzone disruptions
-    → Higher payout multiplier due to compounded disruption risk
-```
-
----
-
-## 👥 Personas & Scenarios
-
-### Persona 1 — Ravi | Food Delivery | Zomato | Hyderabad (Standard Shield)
-
-| Attribute | Detail |
-|-----------|--------|
-| Age | 28 |
-| Vehicle | Petrol two-wheeler |
-| Daily earnings | ₹700–900 |
-| Weekly premium | ₹49 |
-| Coverage | ₹3,500/week income protection |
-| Pain point | Loses 3–4 working days during Hyderabad monsoon flooding |
-
-**Trigger Scenario:** IMD issues a Red Alert for Hyderabad. Rainfall exceeds 35mm/hr. TriggrPay detects the trigger, cross-checks Ravi's last active GPS zone, calculates 6 lost hours × ₹90/hr = **₹540 auto-paid to his UPI within 15 minutes.** Zero claim needed.
-
----
-
-### Persona 2 — Meena | Grocery Delivery | Zepto | Bengaluru (Standard Shield)
-
-| Attribute | Detail |
-|-----------|--------|
-| Age | 32 |
-| Vehicle | Petrol scooter |
-| Daily earnings | ₹600–800 |
-| Weekly premium | ₹49 |
-| Coverage | ₹3,000/week income protection |
-| Pain point | AQI-related advisories and bandhs in Bengaluru shut her zone |
-
-**Trigger Scenario:** BBMP announces sudden micro-zone shutdown in Koramangala due to civic unrest. TriggrPay detects zone closure via geofencing + news API, validates Meena was scheduled to work that zone, and auto-triggers a proportional payout.
-
----
-
-### Persona 3 — Arjun | Q-Commerce Delivery | Blinkit | Hyderabad (EV Shield ⚡)
-
-| Attribute | Detail |
-|-----------|--------|
-| Age | 24 |
-| Vehicle | Zypp Electric scooter |
-| Daily earnings | ₹750–950 |
-| Weekly premium | ₹79 |
-| Coverage | ₹4,500/week income protection |
-| Pain point | Summer heat degrades EV range + charging stations go offline |
-
-**Trigger Scenario:** Temperature hits 43°C in Hyderabad. EV range model predicts battery operates at 65% capacity. Charging station API shows 2 of 3 nearby stations at >90% occupancy. Combined disruption score crosses threshold — **EV Shield triggers automatically, Arjun receives ₹720 payout.** He never filed anything.
-
----
-
-## 💰 Weekly Premium Model
-
-We deliberately chose **weekly pricing** because delivery workers are paid weekly by platforms. Insurance must match their cash flow cycle.
-
-### Standard Shield — ₹49/week
-
-| Payout Tier | Disruption Duration | Weekly Payout |
-|-------------|--------------------|--------------:|
-| Partial | 2–4 hours lost | ₹350 |
-| Major | 4–8 hours lost | ₹700 |
-| Full Day | Full day lost | ₹1,100 |
-| Multi-Day | 2+ days lost | Up to ₹3,500 |
-
-### EV Shield Premium — ₹79/week
-
-| Payout Tier | Disruption Type | Weekly Payout |
-|-------------|----------------|-------------:|
-| Heat Partial | Range drop >25% | ₹400 |
-| Grid Outage | Charging down >4hrs | ₹600 |
-| Compound Event | Heat + Grid + Rain | Up to ₹4,500 |
-
-### AI-Driven Dynamic Pricing Factors
-
-The ₹49 and ₹79 are **base rates**. Our ML model adjusts the weekly premium up/down based on:
-- Historical disruption frequency in the rider's operating zone
-- Season (monsoon = higher risk adjustment)
-- Rider tenure on platform (proxy for earnings stability)
-- EV battery age & model (for EV Shield only)
-- Charging station density in operating radius (for EV Shield only)
+### 🔌 Add-On Shields
+| Add-On | Price | Covers |
+|---|---|---|
+| **Night Surge Shield** | ₹29/week | Late-night curfews, nakabandi, crowd dispersal (10 PM–6 AM) with 1.4x payout multiplier |
+| **Festival Income Guard** | ₹19/event week | AI-predicted festival disruptions — Diwali, Eid, Holi — 1.5x payout |
+| **Device Shield** | ₹15/week | Income loss from verified phone failure (UPI-linked repair proof) |
 
 ---
 
 ## ⚡ Parametric Triggers
 
-Parametric insurance pays automatically when a measurable external parameter crosses a threshold. No human adjuster. No claim form. Just **data → decision → payment.**
-
-### Standard Shield Triggers
-
-| # | Trigger | Data Source | Threshold | Payout Initiated |
-|---|---------|-------------|-----------|-----------------|
-| T1 | Heavy Rainfall | IMD / OpenWeatherMap API | > 20mm/hr | Proportional to hours lost |
-| T2 | Severe Flood Alert | NDMA / State Disaster API | Red Alert issued | Full day payout |
-| T3 | AQI Emergency | SAFAR / CPCB API | AQI > 300 (Hazardous) | Partial to full |
-| T4 | Government Curfew | NewsAPI / mock | Geo-tagged curfew order | Full day payout |
-| T5 | Zone/Market Closure | Mock platform API | Rider's active zone closed | Proportional payout |
-
-### EV Shield Additional Triggers
-
-| # | Trigger | Data Source | Threshold | Payout Initiated |
-|---|---------|-------------|-----------|-----------------|
-| T6 | Extreme Heat | IMD / OpenWeatherMap | Temp > 42°C | Range-loss payout |
-| T7 | Power Grid Outage | State DISCOM API (mock) | Outage > 2hrs in zone | Grid-loss payout |
-| T8 | Charging Infra Congestion | EV station API (mock) | >85% occupancy nearby | Compound payout |
+| # | Trigger | Source | Threshold |
+|---|---------|--------|-----------|
+| T1 | Heavy Rainfall | OpenWeatherMap | >20mm/hr |
+| T2 | Flood Alert | NDMA API | Red Alert |
+| T3 | AQI Emergency | SAFAR/CPCB | AQI >300 |
+| T4 | Government Curfew | NewsAPI | Geo-tagged order |
+| T5 | Zone Closure | Mock Platform API | Active zone closed |
+| T6 | Extreme Heat ⚡ | IMD/OpenWeatherMap | Temp >42°C |
+| T7 | Grid Outage ⚡ | DISCOM API (mock) | Outage >2hrs |
+| T8 | Charging Congestion ⚡ | EV Station API (mock) | >85% occupancy |
+| T9 | Night Disruption 🌙 | NewsAPI + GPS | Late-night zone event |
+| T10 | Order Drought | Platform API (mock) | 0 orders, 3+ hrs, clear weather |
 
 ---
 
-## 🤖 AI/ML Architecture
+## 🤖 AI/ML Features
 
-### 1. Dynamic Premium Calculation (Pre-Policy)
+### Dynamic Premium (XGBoost)
+Personalises ₹49/₹79 base rate using zone disruption history, season, rider tenure, EV battery age, charging station density, and working hours (night shift = different risk profile).
 
-**Model:** Gradient Boosted Trees (XGBoost)
+### EarningsSync — India First
+With rider consent, connects to UPI transaction history (NPCI) to calculate verified 90-day average earnings. Premium AND payout based on **real income** — not self-reported. Eliminates moral hazard. Creates India's first verified gig worker income profile.
 
-**Features:**
-- Zone-level historical disruption frequency (last 12 months)
-- Seasonal risk multiplier (monsoon, summer heatwave months)
-- Platform delivery density in zone (proxy for income potential)
-- EV-specific: battery health model, charging station density radius
-- Rider's registered operating hours (morning vs night shift risk profile)
+### GeoShift Repricing
+When GPS detects consistent activity in a new city for 7 days, AI auto-detects migration and reprices premium for new city's risk profile. No manual update needed.
 
-**Output:** Personalized weekly premium with explainable adjustment breakdown shown to rider at signup.
+### Festival Predictor
+7 days before major festivals, AI predicts disruption probability using historical traffic data, police bandobast announcements, and city-specific patterns. Proactively offers Festival Income Guard upgrade to riders.
 
-### 2. Claim Trigger Validation (Real-Time)
-
-**Model:** Rule-based engine + anomaly scoring
-
-**Process:**
-1. External API fires a potential trigger event
-2. Rules engine checks if threshold is breached
-3. Cross-validation: Is the rider's last known GPS zone affected?
-4. If yes → claim auto-initiated, payout calculated, sent to payment gateway
-
-### 3. Fraud Detection (Anomaly Detection)
-
-**Model:** Isolation Forest + Rule-based flags
-
-**Detection patterns:**
-- Rider claims disruption but GPS shows active movement during event window → **flag**
-- EV rider claims heat-battery trigger but temperature data shows 32°C, not 42°C → **flag**
-- Multiple riders in the same zone all file within seconds (coordinated fraud ring) → **flag**
-- Rider's platform order data (mocked) shows active deliveries during claimed outage → **flag**
-- Same rider claims EV outage while 3 nearby charging stations show normal uptime → **flag**
-
-**Output:** Fraud Score 0–100. Score > 70 → hold for manual review. Score < 70 → auto-approve.
+### Order Drought Detection
+If rider is logged in, GPS shows active zone, weather is clear, but receives 0 orders for 3+ hours — platform throttling detected via cross-validation with 5+ riders in same zone. Pays ₹200 flat.
 
 ---
 
-## 🏗️ Tech Stack
+## 🛡️ Fraud Defense (4-Layer)
 
-### Frontend
+**Layer 1 — GPS Authenticity:** Movement variance + cell tower triangulation + platform order cross-check. Spoofed GPS = zero micro-movement variance. Caught.
 
-| Layer | Technology | Reason |
-|-------|-----------|--------|
-| Framework | React + Next.js | SSR for fast load on mobile networks |
-| UI Library | Tailwind CSS + shadcn/ui | Rapid, accessible UI |
-| State Management | Zustand | Lightweight, sufficient for scope |
-| Maps/Geo | Leaflet.js | Zone visualization, free tier |
+**Layer 2 — Ring Detection:** Velocity check (>15 claims/60sec/2km²) + device fingerprinting + social graph analysis (shared UPI IFSCs, referral codes, onboarding within 48hrs).
 
-### Backend
+**Layer 3 — Worker Protection:** Trusted Rider badge (6+ months clean) = auto-approve. New riders get 50% provisional payout immediately during genuine Red Alerts. Video appeal available for any rejected claim.
 
-| Layer | Technology | Reason |
-|-------|-----------|--------|
-| API Server | FastAPI (Python) | ML-native, fast async |
-| Auth | JWT + OTP via Firebase | Gig worker-friendly onboarding |
-| Database | PostgreSQL (Supabase) | Relational + real-time subscriptions |
-| Queue | Redis | Trigger event processing pipeline |
+**Layer 4 — Fraud Score Engine:**
 
-### AI/ML
+| Signal | Weight |
+|--------|--------|
+| GPS vs platform activity | 25% |
+| Claim velocity in zone | 20% |
+| Rider tenure & history | 20% |
+| Device fingerprint | 15% |
+| Cell tower vs GPS | 10% |
+| EV charging cross-ref | 10% |
 
-| Component | Technology |
-|-----------|-----------|
-| Premium Model | XGBoost (scikit-learn) |
-| Fraud Detection | Isolation Forest (scikit-learn) |
-| Trigger Engine | Python rule-based + API polling |
-| Model Serving | FastAPI ML endpoints |
-
-### Integrations
-
-| Integration | API / Tool | Tier |
-|------------|-----------|------|
-| Weather | OpenWeatherMap API | Free tier |
-| AQI | SAFAR CPCB API | Free tier |
-| News/Curfew | NewsAPI | Free tier |
-| Platform Data | Mock/Simulated | Simulated |
-| EV Charging | PlugShare API / Mock | Mock |
-| Power Grid | DISCOM API | Mock |
-| Payments | Razorpay Test Mode | Sandbox |
-
-### Hosting
-
-| Service | Platform |
-|---------|---------|
-| Frontend Prototype | Base44 (quantum-knot-shield.base44.app) |
-| Frontend (Phase 2+) | Vercel (free tier) |
-| Backend | Railway / Render (free tier) |
-| DB | Supabase (free tier) |
-| ML Models | Hugging Face Spaces / Railway |
+Score 0–40 = auto-approve | 41–69 = monitor | 70–84 = 50% provisional | 85–100 = hold
 
 ---
 
-## 🗓️ Development Plan
+## 💼 Business Economics
 
-### Phase 1 (Seed) — March 4–20: Ideation & Foundation ✅
-- [x] Repository setup
-- [x] README and core documentation
-- [x] Adversarial defense & anti-spoofing strategy (Market Crash response)
-- [x] Live prototype deployed on Base44
-- [x] Onboarding flow with policy selection (Standard Shield vs EV Shield)
-- [x] Auto-payout trigger simulation demo
-- [x] 2-minute demo video
+**Why TriggrPay is profitable:**
+- Cost per claim: **<₹1** (API calls only) vs ₹1,000–1,600 for traditional insurers
+- Target loss ratio: **55–65%** (industry average: 85–95%)
+- Net margin: **₹13/week** per Standard rider | **₹17/week** per EV rider
+- Catastrophic risk hedged via **reinsurance** (10% of premiums)
 
-### Phase 2 (Scale) — March 21 – April 4: Automation & Protection
-- [ ] Registration and profile flow (complete)
-- [ ] Policy creation with dynamic weekly premium calculation
-- [ ] 5 parametric trigger automations (live API + mock)
-- [ ] Claims management module
-- [ ] EV Shield tier full implementation
-- [ ] Basic ML premium model (trained on synthetic data)
-
-### Phase 3 (Soar) — April 5–17: Scale & Optimise
-- [ ] Full fraud detection module (Isolation Forest)
-- [ ] Razorpay sandbox payout integration
-- [ ] Worker dashboard (earnings protected, active coverage)
-- [ ] Admin/Insurer dashboard (loss ratios, predictive analytics)
-- [ ] GPS spoofing detection
-- [ ] Historical weather-based fraud validation
-- [ ] Final demo video + pitch deck
+**Proven global model:** Pula ($70M, 15M farmers) · Arbol (30+ countries) · FloodFlash (200% YoY) · IFFCO-Tokio (India, govt-backed)
 
 ---
 
-## 📁 Repository Structure (Planned)
+## 🚀 Go-To-Market
+
+**Phase 1 — EV Fleet Partnerships:** Zypp Electric + Euler Motors (50,000+ EV riders). We are their welfare layer, not a competitor.
+
+**Phase 2 — Rider Unions:** IFAT (200,000+ gig workers). One deal = instant captive distribution.
+
+**Phase 3 — IRDAI Regulatory Sandbox (2019):** Operate as parametric protection product with licensed insurer as underwriter. Exact model used by Acko and Digit at launch.
+
+**White-label path:** "Powered by TriggrPay" on Zomato's app = zero distribution cost.
+
+---
+
+## 🏗️ Tech Stack (MERN)
+
+| Layer | Stack |
+|-------|-------|
+| **Frontend** | React 18 + Vite, Tailwind CSS, shadcn/ui, Zustand, Recharts, Leaflet.js, React Hook Form + Zod |
+| **Backend** | Node.js 20, Express.js, node-cron (trigger polling), Socket.io (real-time payouts), Winston (logging) |
+| **Database** | MongoDB Atlas — geospatial indexes for GPS zones, aggregation for loss ratio analytics |
+| **ML Service** | Python Flask microservice — XGBoost (premium) + Isolation Forest (fraud) called by Node.js |
+| **Integrations** | OpenWeatherMap · SAFAR AQI · NewsAPI · Razorpay sandbox · Firebase Auth · Google Maps |
+| **Hosting** | Vercel (React) · Render (Node.js + Flask) · MongoDB Atlas M0 |
+
+---
+
+## 🗓️ Roadmap
+
+**Phase 1 ✅** — Architecture · README · Fraud defense · Live Base44 prototype · Trigger simulation · Video
+
+**Phase 2** — MongoDB schemas · Express API · XGBoost premium model · 5 live triggers · Razorpay sandbox · EarningsSync MVP
+
+**Phase 3** — Full fraud detection · GPS spoofing detection · Worker + Admin dashboards · Festival Predictor · GeoShift repricing · Final demo
+
+---
+
+## 📁 Structure
 
 ```
 TriggrPay/
-├── frontend/               # Next.js React app
-│   ├── components/         # UI components
-│   ├── pages/              # App routes
-│   └── styles/             # Tailwind config
-├── backend/                # FastAPI server
-│   ├── api/                # Route handlers
-│   ├── models/             # DB models
-│   ├── services/           # Trigger engine, payment service
-│   └── ml/                 # ML model training + inference
-├── data/                   # Synthetic training data
-├── docs/                   # Architecture diagrams, wireframes
-└── README.md
+├── client/          # React + Vite frontend
+├── server/          # Express + Node.js API
+│   ├── models/      # Mongoose schemas
+│   ├── services/    # triggerEngine, payoutService, fraudService
+│   └── jobs/        # node-cron trigger monitor
+├── ml-service/      # Python Flask — XGBoost + Isolation Forest
+└── docs/            # Architecture diagrams
 ```
 
 ---
 
-## 🌍 Why Hyderabad? (Hyperlocal Relevance)
+## 🌍 Why Hyderabad
 
-- **Extreme Summers:** Temperatures regularly hit 42–45°C in April–May — ideal for validating EV heat triggers with real IMD data
-- **Monsoon Flooding:** GHMC flood-prone zones provide real disruption geography for weather triggers
-- **EV Ecosystem:** Zypp Electric actively operates in Hyderabad — real persona, real disruption data
-- **AQI Data:** TSPCB provides city-level AQI data freely — feeds our pollution trigger model
-
----
-
-## 📊 Business Viability
-
-| Metric | Estimate |
-|--------|---------|
-| Total addressable market | 10M+ gig delivery workers in India |
-| EV delivery segment growth | 40% YoY (2024–2026) |
-| Average weekly premium | ₹49–79 |
-| Break-even loss ratio target | <65% |
-| Distribution channel | EV fleet partnerships + rider unions |
-
----
-
-## 🚀 Go-To-Market Strategy
-
-TriggrPay will **not** compete with platforms for rider relationships. Instead we go around them through three phases:
-
-### Phase 1 — EV Fleet Partnerships
-Partner directly with **Zypp Electric** and **Euler Motors** who manage 50,000+ EV riders and desperately need welfare products for rider retention. We are their insurance layer — not a competitor. They distribute us, we protect their riders.
-
-### Phase 2 — Rider Union Distribution
-**IFAT** (Indian Federation of App-based Transport Workers) represents 200,000+ gig workers and actively seeks financial protection products for members. One partnership = instant access to a large captive audience who already trust the union.
-
-### Phase 3 — Regulatory Path
-Operate under the **IRDAI Regulatory Sandbox framework (2019)** as a parametric protection product — not traditional insurance. Partner with a licensed insurer (New India Assurance, HDFC Ergo) as underwriter while TriggrPay provides the AI and tech layer. This is the exact model used by Acko and Digit when they launched.
-
-### Why Platforms Won't Just Copy Us
-- Building parametric AI + fraud detection is a 12–18 month engineering effort
-- Platforms are not in the insurance business — regulation is a barrier for them
-- We can white-label our product TO platforms as a worker welfare benefit
-- "Powered by TriggrPay" on Zomato's app = distribution at zero cost to us
-
----
-
-## 💼 Business Economics — How Everyone Wins
-
-### The Core Insight: Parametric Changes Everything
-
-Traditional insurers are profitable by **delaying and denying** claims.
-TriggrPay is profitable by **automating and trusting data.**
-These are fundamentally different business models — and ours is better for both the worker AND the company.
-
----
-
-### 🧑‍🤝‍🧑 The Worker's Side
-
-| Problem with Traditional Insurance | How TriggrPay Fixes It |
-|------------------------------------|--------------------------|
-| Fill long claim forms | Zero forms — event is the claim |
-| Wait 30–90 days for payout | ₹540 in 15 minutes via UPI |
-| Claims get rejected arbitrarily | If threshold met, payout is guaranteed |
-| Complex policy language | One number: ₹49/week. One promise: we pay when disruption hits |
-| No help during worst moments | Payout arrives BEFORE the worker even realizes they should claim |
-
-> The worker never fights the system. The data fights for them.
-
----
-
-### 🏢 The Company's Side
-
-#### Step 1 — Risk Pooling
-
-We collect premiums from ALL riders but only pay riders in the AFFECTED zone during a disruption.
-
-```
-Example — Hyderabad, any given week:
-├── 1,000 riders paying ₹49/week = ₹49,000 premium collected
-├── Heavy rain hits 120 riders in Zone A
-├── Payout: 120 × ₹540 = ₹64,800
-└── Calm weeks (3 out of 4): same ₹49,000 collected, near zero payouts
-    Monthly average: ₹1,96,000 collected vs ₹64,800 payout = 33% loss ratio ✅
-```
-
-#### Step 2 — The Loss Ratio Target
-
-```
-Loss Ratio = Total Payouts ÷ Total Premiums
-
-Target: < 65%
-Meaning: For every ₹100 collected → max ₹65 paid out
-Remaining ₹35 → operations, AI infrastructure, profit
-
-A traditional insurer runs 85–95% loss ratio (barely profitable)
-TriggrPay targets 55–65% because:
-→ Zero claim adjustment cost (APIs replace human adjusters)
-→ Fraud detection eliminates ~15% false claims automatically
-→ Parametric triggers prevent subjective over-claiming
-```
-
-#### Step 3 — AI Reduces Operational Cost to Near Zero
-
-```
-Traditional Insurer Cost Per Claim:
-├── Human adjuster salary:    ₹800–1,200 per claim
-├── Investigation time:       15–45 days
-├── Paperwork processing:     ₹200–400 per claim
-└── Total:                    ₹1,000–1,600 per claim processed
-
-TriggrPay Cost Per Claim:
-├── API call (weather check): ₹0.002
-├── GPS validation query:     ₹0.001
-├── Fraud score computation:  ₹0.008
-└── Total:                    < ₹1 per claim processed ✅
-```
-
-#### Step 4 — Basis Risk is Our Profitability Cushion
-
-```
-IMD reports: 18mm/hr rainfall (threshold: 20mm/hr)
-Some riders genuinely couldn't work → but threshold not met
-TriggrPay: No payout triggered
-
-This is not unfair — it's transparent and agreed upfront.
-The rider knew the threshold when they signed up.
-This predictability is what makes the model sustainable.
-```
-
-#### Step 5 — Reinsurance for Catastrophic Events
-
-```
-TriggrPay collects:   ₹49,000/week from Hyderabad riders
-TriggrPay pays:       ~₹4,900/week to reinsurer (10% of premium)
-In return:            Reinsurer covers payouts above ₹2,00,000 per event
-
-This is how Pula (Africa), Arbol, and FloodFlash operate globally.
-Same model. Proven profitable.
-```
-
----
-
-### 📊 Unit Economics Per Rider (Weekly)
-
-#### Standard Shield Rider
-
-```
-Premium collected:          ₹49/week
-Expected payout cost:       ₹28/week (actuarial avg, ~4 disruptions/year)
-Fraud detection savings:    ₹4/week  (15% false claim prevention)
-API + infrastructure cost:  ₹3/week
-Reinsurance cost:           ₹5/week
-────────────────────────────────────────
-Net contribution margin:    ₹13/week per rider ✅
-
-At 10,000 riders:    ₹1,30,000/week profit
-At 1,00,000 riders:  ₹13,00,000/week profit
-```
-
-#### EV Shield Rider
-
-```
-Premium collected:          ₹79/week
-Expected payout cost:       ₹42/week (higher risk, EV-specific events)
-Fraud detection savings:    ₹7/week  (EV sensor data = better verification)
-API + infrastructure cost:  ₹5/week
-Reinsurance cost:           ₹8/week
-────────────────────────────────────────
-Net contribution margin:    ₹17/week per rider ✅
-```
-
----
-
-### 🌍 Comparable Global Models Proving This Works
-
-| Company | Model | Result |
-|---------|-------|--------|
-| **Pula** (Africa) | Parametric crop insurance for smallholder farmers | $70M raised, 15M farmers covered |
-| **Arbol** | Weather parametric for agricultural businesses | Profitable, 30+ countries |
-| **FloodFlash** | Sensor-triggered instant flood payout | Growing 200% YoY in UK |
-| **IFFCO-Tokio** | Parametric crop insurance in India | Government-backed, scaled nationally |
-| **Nuo** | Gig worker income protection (Southeast Asia) | Series A funded |
-
-> TriggrPay brings this proven global model to India's 10M+ gig delivery workers — a segment with **zero existing parametric coverage.**
-
----
-
-### The Bottom Line
-
-| | Worker | Company |
-|---|---|---|
-| **Gets** | Instant payout. No forms. No rejection. Weekly pricing. | Low cost. Data-driven payouts. Fraud-proof. Scalable margins. |
-| **How** | Event is the claim. UPI in 15 mins. | APIs replace adjusters. Reinsurance covers catastrophes. |
-| **Result** | Financial safety net that actually works | Profitable at 55–65% loss ratio |
-
-> This is not charity. This is smart insurance.
-
----
-
-## 🛡️ Adversarial Defense & Anti-Spoofing Strategy
-### Market Crash Response: Operation Fraud Ring Takedown
-
----
-
-### The Attack We're Defending Against
-
-A coordinated fraud ring is exploiting parametric triggers by:
-- **GPS Spoofing** — faking location to appear in a disrupted zone while actually working normally elsewhere
-- **Synthetic Disruption Claims** — filing claims during real weather events but from unaffected zones
-- **Ring Coordination** — 500+ riders filing identical claims within seconds of each other
-- **Ghost Riders** — fake accounts created purely to collect payouts during disruption events
-
----
-
-### Our 4-Layer Defense Architecture
-
-#### Layer 1 — GPS Authenticity Verification
-
-**Problem:** Rider claims to be in flood-affected Zone A but is actually in Zone C working normally.
-
-**How we catch it:**
-- Cross-reference claimed GPS location against **platform order history** — if the rider completed deliveries during the "disruption window," the claim is auto-rejected
-- Compare GPS altitude + speed data patterns — a spoofed location shows 0 km/h with zero movement variance; a genuinely stranded rider shows micro-movements (shifting, walking to shelter)
-- **Cell tower triangulation cross-check** — GPS coordinates must match the cell tower the rider's device is pinging within a 200m radius
-- EV Shield specific: If rider claims heat-battery failure, check if charging station API shows the rider's registered vehicle attempting a charge during that window — a truly stranded rider won't show a charge attempt
-
-**Decision:** GPS + platform activity + cell tower contradiction → fraud score +60 → hold for review
-
----
-
-#### Layer 2 — Fraud Ring Pattern Detection
-
-**Problem:** 500 riders submit identical claims within 90 seconds of a trigger event.
-
-**How we catch it:**
-- **Velocity check** — more than 15 claims from the same 2km² zone within 60 seconds activates ring-detection flag
-- **Claim template fingerprinting** — if claim metadata (device model, submission time pattern, network IP range) shows statistical clustering, the entire batch is flagged
-- **Social graph analysis** — flagged riders sharing referral codes, onboarding timestamps within 48 hours of each other, or identical UPI bank IFSCs spikes the ring probability score
-- **Historical baseline comparison** — a zone that normally generates 8 claims per disruption event suddenly generating 200 triggers a manual review gate
-
-**Decision:** Ring probability score > 75 → entire cluster frozen, individual reviews initiated, payouts held 24 hours
-
----
-
-#### Layer 3 — Genuine Stranded Worker Protection
-
-**The hardest problem:** How do we catch fraudsters without punishing honest workers?
-
-**Our rules:**
-- Riders with **6+ months of clean claim history** get a "Trusted Rider" badge — their claims auto-approve even if zone velocity is high
-- First-time claims during genuinely catastrophic events (IMD Red Alert, NDMA flood declaration) get **automatic provisional payout of 50% immediately** — the remaining 50% releases after 24-hour verification
-- **Human appeal layer** — any auto-rejected claim can be appealed with a 30-second video of surroundings. Our AI vision model checks if the environment matches the claimed disruption
-- Riders in the system 3+ months with no prior flags are never fully blocked — worst case is a 24-hour hold, never permanent denial
-
----
-
-#### Layer 4 — Real-Time Fraud Score Engine
-
-Every claim generates a **Fraud Score (0–100)** computed from:
-
-| Signal | Weight | Fraud Indicator |
-|--------|--------|----------------|
-| GPS vs platform activity match | 25% | Mismatch = high fraud |
-| Claim velocity in zone | 20% | Spike = high fraud |
-| Rider tenure & history | 20% | New account = higher risk |
-| Device fingerprint cluster | 15% | Shared device = high fraud |
-| Cell tower vs GPS match | 10% | Mismatch = high fraud |
-| EV charging station cross-ref | 10% | Active charge = fraud flag |
-
-**Score thresholds:**
-
-| Score | Action |
-|-------|--------|
-| 0–40 | Auto-approve, full payout |
-| 41–69 | Approve with monitoring flag |
-| 70–84 | Provisional 50% payout, 24hr review |
-| 85–100 | Hold all payout, manual investigation, rider notified |
-
----
-
-### Why Our System Doesn't Punish Honest Workers
-
-The key insight: **fraudsters act in clusters. Genuine workers act alone.**
-
-A real stranded rider in Hyderabad during a flood:
-- Location matches the flood zone ✅
-- No platform deliveries during the event ✅
-- Normal GPS movement variance — not perfectly stationary ✅
-- NOT part of a 500-person simultaneous claim cluster ✅
-- Prior clean history ✅
-
-A fraud ring member:
-- Perfect GPS coordinates — too perfect, zero variance ❌
-- Platform activity shows they were actively working ❌
-- Filed within seconds of 200 others from the same IP range ❌
-- Created account within 48 hours of other ring members ❌
-
-Our system scores the **combination** of signals — not any single one. A new rider during a genuine Red Alert still gets their 50% provisional payout. **We never leave a genuinely stranded worker empty-handed.**
-
----
-
-## 👨‍💻 Team
-
-**QuantumKnot** | Guidewire DEVTrails 2026
+Real data. Real disruptions. 42–45°C summers for EV heat triggers. GHMC flood zones for rainfall triggers. Zypp Electric operates here. TSPCB AQI data freely available.
 
 ---
 
 ## 📎 Links
 
-- 🎥 Demo Video: *(add your YouTube link here)*
+- 🎥 Demo Video: *(add YouTube link)*
 - 🌐 Live Prototype: [quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)
-- 📄 Pitch Deck: *(to be added in Phase 3)*
+- 📄 Pitch Deck: *(Phase 3)*
 
 ---
 
-*Built with ❤️ for India's gig economy workers. TriggrPay — because the disruption triggers the pay.*
+*TriggrPay — because the disruption triggers the pay. Built for India's gig economy workers. ❤️*
