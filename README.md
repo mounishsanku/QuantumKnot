@@ -5,7 +5,7 @@
 
 [![Phase](https://img.shields.io/badge/Phase-1%20Seed-yellow)](https://github.com/mounishsanku/QuantumKnot)
 [![Status](https://img.shields.io/badge/Status-Active-green)](https://github.com/mounishsanku/QuantumKnot)
-[![Live](https://img.shields.io/badge/Prototype-Live-brightgreen)](https://quantum-knot-shield.base44.app)
+[![Live](https://img.shields.io/badge/Prototype-Live-brightgreen)](https://triggrpay-quantum-knot.base44.app)
 
 ---
 
@@ -171,7 +171,7 @@ Real data. Real disruptions. 42–45°C summers for EV heat triggers. GHMC flood
 ## 📎 Links
 
 - 🎥 Demo Video: *(add YouTube link)*
-- 🌐 Live Prototype: [quantum-knot-shield.base44.app](https://quantum-knot-shield.base44.app)
+- 🌐 Live Prototype: [triggrpay-quantum-knot.base44.app](https://triggrpay-quantum-knot.base44.app)
 - 📄 Pitch Deck: *(Phase 3)*
 
 ---
