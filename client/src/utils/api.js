@@ -24,6 +24,12 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     
+    // CRITICAL: Skip Auth for public requests
+    if (config.isPublic) {
+      console.log("TOKEN: SKIPPING (Public Request)");
+      return config;
+    }
+
     // CRITICAL: Debug log requested by user
     console.log("TOKEN:", token);
 

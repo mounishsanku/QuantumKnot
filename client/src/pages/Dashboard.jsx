@@ -40,23 +40,27 @@ export default function Dashboard() {
   const [simResult, setSimResult] = useState(null);
 
   useEffect(() => {
+    // 🛡️ Only fetch private data if token and rider are ready
+    if (!token || !rider) return;
+
     const load = async () => {
       setLoading(true);
       try {
         const [pRes, cRes] = await Promise.all([
-          api.get("/api/policies/active"),
+          api.get("/api/policies/my-policy"),
           api.get("/api/claims/my-claims"),
         ]);
         setPolicy(pRes.data.policy);
         setClaims(cRes.data.claims || []);
       } catch (e) {
-        toast.error(e.response?.data?.message || "Failed to load dashboard");
+        console.error("Dashboard private fetch error:", e.message);
+        toast.error(e.response?.data?.message || "Failed to load protected data");
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, []);
+  }, [token, rider]);
 
   useEffect(() => {
     if (!token) return;
@@ -119,12 +123,13 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // 🌦️ Fetch Public Weather Data (No Auth Required)
     const city = rider?.city || "Hyderabad";
     const run = async () => {
       setWeatherLoading(true);
       try {
         const q = `${encodeURIComponent(city)},IN`;
-        const { data } = await api.get(`/api/weather?q=${q}`);
+        const { data } = await api.get(`/api/weather?q=${q}`, { isPublic: true });
         
         setAqiLabel(data.aqiLabel || "—");
         setWeather({ 

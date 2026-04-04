@@ -43,23 +43,26 @@ export default function App() {
     const t = localStorage.getItem("token");
     if (!t) {
       setBooting(false);
+      setAuth(null, null); // Clear state if no token
       return;
     }
     
-    setBooting(true);
     // Use /api/auth/me to verify existing session
+    setBooting(true);
     api
       .get("/api/auth/me")
       .then((res) => {
-        // res.data.rider contains the profile
         setAuth(t, res.data.rider);
       })
-      .catch(() => {
-        // If /me fails, the token is invalid or expired
+      .catch((err) => {
+        console.error("Session verification failed:", err.message);
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         setAuth(null, null);
       })
-      .finally(() => setBooting(false));
+      .finally(() => {
+        setBooting(false);
+      });
   }, [setAuth]);
 
   if (booting && localStorage.getItem("token")) {
