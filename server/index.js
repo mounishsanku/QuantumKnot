@@ -131,6 +131,13 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// API Routes
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  next();
+});
+
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);

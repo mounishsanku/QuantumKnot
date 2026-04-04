@@ -38,6 +38,7 @@ export const authMiddleware = async (req, res, next) => {
     next();
   } catch (err) {
     // Catch-all: Any token error results in 401 to trigger clean frontend logout
+    logger.error(`[auth] Verification failed: ${err.message} — Name: ${err.name}`);
     return res.status(401).json({ message: "Session expired or invalid" });
   }
 };

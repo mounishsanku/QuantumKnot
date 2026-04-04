@@ -56,7 +56,7 @@ api.interceptors.response.use(
           
           // Delay redirect slightly to allow toast to be seen
           setTimeout(() => {
-            window.location.href = "/login";
+            window.location.replace("/login");
           }, 800);
         } else {
           isRedirecting = false;
