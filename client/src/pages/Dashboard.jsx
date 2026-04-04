@@ -109,8 +109,9 @@ export default function Dashboard() {
       }
     } catch (e) {
       toast.dismiss(loadingToast);
-      toast.error("Simulation failed. Try again.");
-      setSimResult({ type: "error", message: "Failed" });
+      const msg = e.response?.data?.message || "Simulation failed. Try again.";
+      toast.error(msg);
+      setSimResult({ type: "error", message: msg });
     } finally {
       setSimulating(null);
       setTimeout(() => setSimResult(null), 5000);

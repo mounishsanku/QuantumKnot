@@ -19,31 +19,36 @@ async function verifyRazorpayKeys() {
 }
 
 export async function processPayout(claimId, riderId, amount, upiId) {
-  const rounded = Math.round(amount * 100) / 100;
-  const payoutDoc = await Payout.create({
-    claimId,
-    riderId,
-    amount: rounded,
-    upiId: upiId || "",
-    status: "processing",
-  });
+  try {
+    const rounded = Math.round(amount * 100) / 100;
+    const payoutDoc = await Payout.create({
+      claimId,
+      riderId,
+      amount: rounded,
+      upiId: upiId || "",
+      status: "processing",
+    });
 
-  const keysOk = await verifyRazorpayKeys();
-  if (keysOk) {
-    logger.info("Razorpay API keys validated; recording demo payout (RazorpayX fund account required for live UPI transfers).");
+    const keysOk = await verifyRazorpayKeys();
+    if (keysOk) {
+      logger.info("Razorpay API keys validated; recording demo payout (RazorpayX fund account required for live UPI transfers).");
+    }
+
+    const transactionId = `txn_${crypto.randomBytes(14).toString("hex")}`;
+    const razorpayPayoutId = `rzp_test_${payoutDoc._id.toString()}`;
+
+    payoutDoc.razorpayPayoutId = razorpayPayoutId;
+    payoutDoc.transactionId = transactionId;
+    payoutDoc.status = "completed";
+    await payoutDoc.save();
+
+    return {
+      transactionId,
+      razorpayPayoutId,
+      payout: payoutDoc,
+    };
+  } catch (err) {
+    logger.error(`[payout] Failed to process payout: ${err.message}`);
+    throw new Error(`Payout processing failed: ${err.message}`);
   }
-
-  const transactionId = `txn_${crypto.randomBytes(14).toString("hex")}`;
-  const razorpayPayoutId = `rzp_test_${payoutDoc._id.toString()}`;
-
-  payoutDoc.razorpayPayoutId = razorpayPayoutId;
-  payoutDoc.transactionId = transactionId;
-  payoutDoc.status = "completed";
-  await payoutDoc.save();
-
-  return {
-    transactionId,
-    razorpayPayoutId,
-    payout: payoutDoc,
-  };
 }
