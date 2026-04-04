@@ -125,7 +125,7 @@ try {
 
 // Start jobs
 startTriggerMonitor(io);
-startTriggerWorker(io);
+// startTriggerWorker(io);
 
 // Start server
 server.listen(PORT, () => {

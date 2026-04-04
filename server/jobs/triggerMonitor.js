@@ -2,7 +2,7 @@ import cron from "node-cron";
 import axios from "axios";
 import Policy from "../models/Policy.js";
 import Rider from "../models/Rider.js";
-import { triggerQueue } from "./triggerQueue.js";
+// import { triggerQueue } from "./triggerQueue.js";
 import logger from "../logger.js";
 
 const CITY_NAMES = {
@@ -53,14 +53,14 @@ async function runMonitor(io) {
 
       if (rain1h > 20) {
         for (const rid of riderIdsInCity) {
-          logger.info(`Queueing rainfall job for rider: ${rid} in ${city}`);
-          await triggerQueue.add("trigger-job", {
-            riderId: rid,
-            triggerType: "rainfall",
-            triggerValue: `${rain1h}mm/hr`,
-            zone: city,
-            timestamp: Date.now()
-          });
+          logger.info(`[REDIS-DISABLED] Rainfall detected for rider: ${rid} in ${city}`);
+          // await triggerQueue.add("trigger-job", {
+          //   riderId: rid,
+          //   triggerType: "rainfall",
+          //   triggerValue: `${rain1h}mm/hr`,
+          //   zone: city,
+          //   timestamp: Date.now()
+          // });
         }
       }
 
@@ -68,14 +68,14 @@ async function runMonitor(io) {
         for (const rid of riderIdsInCity) {
           const rider = await Rider.findById(rid).lean();
           if (rider && rider.vehicleType === "ev") {
-            logger.info(`Queueing heat job for rider: ${rid} in ${city}`);
-            await triggerQueue.add("trigger-job", {
-              riderId: rid,
-              triggerType: "heat",
-              triggerValue: `${temp}°C`,
-              zone: city,
-              timestamp: Date.now()
-            });
+            logger.info(`[REDIS-DISABLED] Heat detected for rider: ${rid} in ${city}`);
+            // await triggerQueue.add("trigger-job", {
+            //   riderId: rid,
+            //   triggerType: "heat",
+            //   triggerValue: `${temp}°C`,
+            //   zone: city,
+            //   timestamp: Date.now()
+            // });
           }
         }
       }
