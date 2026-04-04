@@ -4,10 +4,11 @@ import toast from "react-hot-toast";
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 /**
- * Unified API Instance: Final Hardened Version
+ * Global API Instance: Final Hardened Version
  * 
- * - Unifies redirect logic for all auth failures
- * - Deduplicates "Session expired" toasts during cascading failures
+ * - Unifies redirect logic based on CRITICAL requirements
+ * - ONLY log out on 401 (Missing Token)
+ * - DO NOT log out on 403 (Invalid/Expired)
  */
 export const api = axios.create({
   baseURL,
@@ -18,10 +19,14 @@ export const api = axios.create({
 // Flag to prevent multiple redirects during concurrent 401s
 let isRedirecting = false;
 
-// Request Interceptor: Attach token
+// Request Interceptor: Attach token + Debug Log
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+    
+    // CRITICAL: Debug log requested by user
+    console.log("TOKEN:", token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,11 +35,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Unified failure handling
+// Response Interceptor: Strict Logout Logic
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 1. Network Errors
     if (!error.response) {
       toast.error("Network error: Server unreachable");
       return Promise.reject(error);
@@ -42,19 +46,19 @@ api.interceptors.response.use(
 
     const { status, data } = error.response;
 
-    // 2. Unify 401/403 as "Session Expired"
-    if (status === 401 || status === 403) {
-      console.warn(`[api] Authentication failure (${status}).`);
-
+    /**
+     * CRITICAL: Strict Logout Filter
+     * - Status 401: Clear and redirect to login
+     * - Status 403: Do NOT Logout (per instruction)
+     */
+    if (status === 401) {
       if (!isRedirecting) {
         isRedirecting = true;
         localStorage.clear();
         
-        // Only redirect if not already on the login page
         if (window.location.pathname !== "/login") {
-          toast.error("Session expired. Please log in again.", { id: "auth-expired" });
+          toast.error("Session expired. Please log in again.");
           
-          // Delay redirect slightly to allow toast to be seen
           setTimeout(() => {
             window.location.replace("/login");
           }, 800);
@@ -64,8 +68,10 @@ api.interceptors.response.use(
       }
     }
 
-    // 3. Handle 500+ Errors
-    if (status >= 500) {
+    // Inform user of error without logging out for 403 or 500
+    if (status === 403) {
+      toast.error(data?.message || "Invalid or expired session access.");
+    } else if (status >= 500) {
       toast.error(data?.message || "Internal server error");
     }
 

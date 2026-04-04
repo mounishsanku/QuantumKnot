@@ -142,6 +142,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/weather", weatherRoutes);
 
 // Error handling
 app.use(notFound);

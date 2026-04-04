@@ -1,44 +1,39 @@
 import jwt from "jsonwebtoken";
-import Rider from "../models/Rider.js";
+import logger from "../logger.js";
 
 /**
- * Final Unified Authentication Middleware
+ * Final Hardened Authentication Middleware
  * 
- * 1. Checks for Authorization: Bearer <token>
- * 2. Verifies using JWT_ACCESS_SECRET
- * 3. Populates both req.user and req.rider for compatibility
+ * 1. Extract token from Authorization: Bearer <token>
+ * 2. Verify using JWT_ACCESS_SECRET
+ * 3. Attach decoded payload to req.user and req.rider
  * 
- * - Returns 401 for ANY token failure (missing, invalid, or expired)
- * - This ensures the frontend interceptor always triggers a consistent redirect.
+ * Status Codes:
+ * - 401: Token missing
+ * - 403: Token invalid or expired
  */
 export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // 1. Missing Header
+  // 1. Missing Token -> 401
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Authorization required" });
+    return res.status(401).json({ message: "Authentication required" });
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
-    // 2. Decode & Verify
+    // 2. Verify
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     
-    // 3. User Existence
-    const rider = await Rider.findById(decoded.id).select("-password");
-    if (!rider) {
-      return res.status(401).json({ message: "User session not found" });
-    }
-
-    // 4. Populate for all routes
-    req.user = rider;
-    req.rider = rider;
+    // 3. Attach decoded payload as requested
+    req.user = decoded;
+    req.rider = decoded;
     
     next();
   } catch (err) {
-    // Catch-all: Any token error results in 401 to trigger clean frontend logout
-    logger.error(`[auth] Verification failed: ${err.message} — Name: ${err.name}`);
-    return res.status(401).json({ message: "Session expired or invalid" });
+    // 4. Invalid or Expired -> 403
+    logger.error(`[auth] Verification failed: ${err.message}`);
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };

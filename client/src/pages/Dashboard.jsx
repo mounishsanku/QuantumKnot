@@ -119,56 +119,22 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const key = import.meta.env.VITE_OPENWEATHERMAP_KEY;
     const city = rider?.city || "Hyderabad";
-    const q = `${encodeURIComponent(city)},IN`;
     const run = async () => {
       setWeatherLoading(true);
       try {
-        const key = import.meta.env.VITE_OPENWEATHERMAP_KEY;
-        if (!key || key === "your_openai_api_key_here") {
-          console.warn("Weather API key missing. Skipping fetch.");
-          setWeather({ temp: "--", desc: "No API Key", city: q });
-          setAqiLabel("—");
-          return;
-        }
-
-        const w = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${q}&appid=${key}&units=metric`
-        );
+        const q = `${encodeURIComponent(city)},IN`;
+        const { data } = await api.get(`/api/weather?q=${q}`);
         
-        if (!w.ok) {
-          throw new Error(`Weather fetch failed: ${w.status}`);
-        }
-
-        const data = await w.json();
-        const rain = data.rain && data.rain["1h"] != null ? data.rain["1h"] : 0;
-        const temp = data.main?.temp != null ? data.main.temp : "--";
-        const lat = data.coord?.lat;
-        const lon = data.coord?.lon;
-        
-        let aqi = "—";
-        if (lat != null && lon != null) {
-          try {
-            const ap = await fetch(
-              `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`
-            );
-            if (ap.ok) {
-              const aj = await ap.json();
-              const idx = aj.list?.[0]?.main?.aqi;
-              const map = { 1: "Good", 2: "Fair", 3: "Moderate", 4: "Poor", 5: "Very poor" };
-              aqi = idx ? map[idx] || String(idx) : "—";
-            }
-          } catch (aqiErr) {
-            console.error("AQI fetch failed:", aqiErr.message);
-          }
-        }
-        
-        setAqiLabel(aqi);
-        setWeather({ rain, temp, city });
+        setAqiLabel(data.aqiLabel || "—");
+        setWeather({ 
+          rain: data.rain, 
+          temp: data.temp, 
+          city: data.city || city 
+        });
       } catch (err) {
         console.error("Dashboard weather fetch error:", err.message);
-        setWeather({ temp: "--", desc: "Unavailable", city: q });
+        setWeather({ temp: "--", desc: "Unavailable", city });
       } finally {
         setWeatherLoading(false);
       }
