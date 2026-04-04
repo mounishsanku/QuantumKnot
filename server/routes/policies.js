@@ -1,16 +1,73 @@
 import { Router } from "express";
 import Policy from "../models/Policy.js";
 import Rider from "../models/Rider.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 import { calculatePremium } from "../services/premiumService.js";
 import { sendPolicyCreatedEmail } from "../services/emailService.js";
 
 const router = Router();
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Policy:
+ *       type: object
+ *       properties:
+ *         tier:
+ *           type: string
+ *           enum: [standard, ev]
+ *         addOns:
+ *           type: array
+ *           items:
+ *             type: string
+ *         weeklyPremium:
+ *           type: number
+ *         coverageAmount:
+ *           type: number
+ *         status:
+ *           type: string
+ *           enum: [active, cancelled]
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         nextRenewalDate:
+ *           type: string
+ *           format: date-time
+ */
+
+/**
+ * @swagger
+ * /api/policies/create:
+ *   post:
+ *     summary: Create a new insurance policy
+ *     tags: [Policies]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tier:
+ *                 type: string
+ *               addOns:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Policy created successfully
+ *       404:
+ *         description: Rider not found
+ */
 router.post("/create", authMiddleware, async (req, res) => {
   try {
     const { tier, addOns = [] } = req.body;
-    const rider = await Rider.findById(req.rider._id);
+    // req.user is populated by authMiddleware
+    const rider = await Rider.findById(req.user.id);
     if (!rider) {
       return res.status(404).json({ message: "Rider not found" });
     }
@@ -65,9 +122,28 @@ router.post("/create", authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/policies/active:
+ *   get:
+ *     summary: Get the active policy for the logged-in rider
+ *     tags: [Policies]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Active policy data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 policy:
+ *                   $ref: '#/components/schemas/Policy'
+ */
 router.get("/active", authMiddleware, async (req, res) => {
   try {
-    const policy = await Policy.findOne({ riderId: req.rider._id, status: "active" }).sort({
+    const policy = await Policy.findOne({ riderId: req.user.id, status: "active" }).sort({
       startDate: -1,
     });
     if (!policy) {

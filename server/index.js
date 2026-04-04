@@ -10,6 +10,8 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 import authRoutes from "./routes/authRoutes.js";
 import policyRoutes from "./routes/policies.js";
 import claimRoutes from "./routes/claims.js";
@@ -128,6 +130,7 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);

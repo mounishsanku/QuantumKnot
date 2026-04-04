@@ -3,10 +3,30 @@ import mongoose from "mongoose";
 import Claim from "../models/Claim.js";
 import Policy from "../models/Policy.js";
 import Payout from "../models/Payout.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 import logger from "../logger.js";
 
 const router = Router();
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Claim:
+ *       type: object
+ *       properties:
+ *         triggerType:
+ *           type: string
+ *         triggerValue:
+ *           type: string
+ *         payoutAmount:
+ *           type: number
+ *         status:
+ *           type: string
+ *           enum: [pending, paid, rejected]
+ *         explanation:
+ *           type: string
+ */
 
 /* ── Demo seed data ── */
 const DEMO_CLAIMS = [
@@ -79,13 +99,37 @@ async function seedDemoClaims(riderId) {
   }
 }
 
+/**
+ * @swagger
+ * /api/claims/my-claims:
+ *   get:
+ *     summary: Get claims for the logged-in rider
+ *     tags: [Claims]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of claims
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 claims:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Claim'
+ *       401:
+ *         description: Unauthorized
+ */
 router.get("/my-claims", authMiddleware, async (req, res) => {
   try {
-    let claims = await Claim.find({ riderId: req.rider._id }).sort({ createdAt: -1 }).lean();
+    // req.user is populated by authMiddleware
+    let claims = await Claim.find({ riderId: req.user.id }).sort({ createdAt: -1 }).lean();
 
     // ── Auto-seed demo claims if rider has none ──
     if (claims.length === 0) {
-      const seeded = await seedDemoClaims(req.rider._id);
+      const seeded = await seedDemoClaims(req.user.id);
       if (seeded.length > 0) {
         claims = seeded.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       }
@@ -104,13 +148,33 @@ router.get("/my-claims", authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/claims/{claimId}:
+ *   get:
+ *     summary: Get details of a single claim
+ *     tags: [Claims]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: claimId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Claim details
+ *       404:
+ *         description: Claim not found
+ */
 router.get("/:claimId", authMiddleware, async (req, res) => {
   try {
     const { claimId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(claimId)) {
       return res.status(400).json({ message: "Invalid claim id" });
     }
-    const claim = await Claim.findOne({ _id: claimId, riderId: req.rider._id }).lean();
+    const claim = await Claim.findOne({ _id: claimId, riderId: req.user.id }).lean();
     if (!claim) {
       return res.status(404).json({ message: "Claim not found" });
     }
@@ -122,4 +186,3 @@ router.get("/:claimId", authMiddleware, async (req, res) => {
 });
 
 export default router;
-
