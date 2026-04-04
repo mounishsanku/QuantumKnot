@@ -128,32 +128,47 @@ export default function Dashboard() {
         const key = import.meta.env.VITE_OPENWEATHERMAP_KEY;
         if (!key || key === "your_openai_api_key_here") {
           console.warn("Weather API key missing. Skipping fetch.");
-          setWeather({ temp: "--", desc: "Key missing", city: q });
+          setWeather({ temp: "--", desc: "No API Key", city: q });
+          setAqiLabel("—");
           return;
         }
 
         const w = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?q=${q}&appid=${key}&units=metric`
         );
+        
+        if (!w.ok) {
+          throw new Error(`Weather fetch failed: ${w.status}`);
+        }
+
         const data = await w.json();
         const rain = data.rain && data.rain["1h"] != null ? data.rain["1h"] : 0;
-        const temp = data.main?.temp;
+        const temp = data.main?.temp != null ? data.main.temp : "--";
         const lat = data.coord?.lat;
         const lon = data.coord?.lon;
-        let aqi = null;
+        
+        let aqi = "—";
         if (lat != null && lon != null) {
-          const ap = await fetch(
-            `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`
-          );
-          const aj = await ap.json();
-          const idx = aj.list?.[0]?.main?.aqi;
-          const map = { 1: "Good", 2: "Fair", 3: "Moderate", 4: "Poor", 5: "Very poor" };
-          aqi = idx ? map[idx] || String(idx) : "—";
+          try {
+            const ap = await fetch(
+              `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`
+            );
+            if (ap.ok) {
+              const aj = await ap.json();
+              const idx = aj.list?.[0]?.main?.aqi;
+              const map = { 1: "Good", 2: "Fair", 3: "Moderate", 4: "Poor", 5: "Very poor" };
+              aqi = idx ? map[idx] || String(idx) : "—";
+            }
+          } catch (aqiErr) {
+            console.error("AQI fetch failed:", aqiErr.message);
+          }
         }
-        setAqiLabel(aqi || "—");
+        
+        setAqiLabel(aqi);
         setWeather({ rain, temp, city });
-      } catch {
-        toast.error("Weather unavailable");
+      } catch (err) {
+        console.error("Dashboard weather fetch error:", err.message);
+        setWeather({ temp: "--", desc: "Unavailable", city: q });
       } finally {
         setWeatherLoading(false);
       }
