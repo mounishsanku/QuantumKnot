@@ -41,7 +41,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     // 🛡️ Only fetch private data if token and rider are ready
-    if (!token || !rider) return;
+    if (!token || !rider) {
+      setLoading(false); // Resolve loader if we're not ready yet
+      return;
+    }
 
     const load = async () => {
       setLoading(true);

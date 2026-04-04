@@ -25,7 +25,7 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
     
     // CRITICAL: Skip Auth for public requests
-    if (config.isPublic) {
+    if (config.isPublic || config.url.includes("/weather")) {
       console.log("TOKEN: SKIPPING (Public Request)");
       return config;
     }
@@ -50,7 +50,15 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const { status, data } = error.response;
+    const { status, data, config } = error.response;
+
+    /**
+     * CRITICAL: Route-based skip for public APIs
+     * We don't want to show "Session expired" for public routes like weather
+     */
+    if (config.url.includes("/weather")) {
+      return Promise.reject(error);
+    }
 
     /**
      * CRITICAL: Strict Logout Filter
