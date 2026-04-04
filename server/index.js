@@ -45,10 +45,11 @@ requireEnv("JWT_SECRET");
 const app = express();
 const server = http.createServer(app);
 
-// CORS
-const clientOrigins = process.env.CLIENT_ORIGIN
-  ? process.env.CLIENT_ORIGIN.split(",")
-  : ["http://localhost:5173", "http://127.0.0.1:5173"];
+const clientOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://quantum-knot.vercel.app"
+];
 
 app.use(
   cors({
