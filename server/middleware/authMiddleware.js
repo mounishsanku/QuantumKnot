@@ -2,41 +2,42 @@ import jwt from "jsonwebtoken";
 import Rider from "../models/Rider.js";
 
 /**
- * Unified Authentication Middleware
+ * Final Unified Authentication Middleware
  * 
  * 1. Checks for Authorization: Bearer <token>
  * 2. Verifies using JWT_ACCESS_SECRET
- * 3. populates both req.user and req.rider for compatibility
+ * 3. Populates both req.user and req.rider for compatibility
  * 
- * Errors:
- * - 401: Token missing or malformed
- * - 403: Token invalid or expired
+ * - Returns 401 for ANY token failure (missing, invalid, or expired)
+ * - This ensures the frontend interceptor always triggers a consistent redirect.
  */
 export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
+  // 1. Missing Header
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Authorization header missing or malformed" });
+    return res.status(401).json({ message: "Authorization required" });
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
+    // 2. Decode & Verify
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     
-    // Fetch rider data to populate req objects
+    // 3. User Existence
     const rider = await Rider.findById(decoded.id).select("-password");
     if (!rider) {
-      return res.status(403).json({ message: "User no longer exists" });
+      return res.status(401).json({ message: "User session not found" });
     }
 
-    // Attach to both properties as requested
+    // 4. Populate for all routes
     req.user = rider;
     req.rider = rider;
     
     next();
   } catch (err) {
-    // If token is invalid or expired, return 403 Forbidden as per request
-    return res.status(403).json({ message: "Invalid or expired access token" });
+    // Catch-all: Any token error results in 401 to trigger clean frontend logout
+    return res.status(401).json({ message: "Session expired or invalid" });
   }
 };

@@ -121,14 +121,17 @@ export default function Dashboard() {
   useEffect(() => {
     const key = import.meta.env.VITE_OPENWEATHERMAP_KEY;
     const city = rider?.city || "Hyderabad";
-    if (!key) {
-      setWeatherLoading(false);
-      return;
-    }
     const q = `${encodeURIComponent(city)},IN`;
     const run = async () => {
       setWeatherLoading(true);
       try {
+        const key = import.meta.env.VITE_OPENWEATHERMAP_KEY;
+        if (!key || key === "your_openai_api_key_here") {
+          console.warn("Weather API key missing. Skipping fetch.");
+          setWeather({ temp: "--", desc: "Key missing", city: q });
+          return;
+        }
+
         const w = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?q=${q}&appid=${key}&units=metric`
         );
