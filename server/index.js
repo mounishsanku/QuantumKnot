@@ -12,8 +12,9 @@ import authRoutes from "./routes/auth.js";
 import policyRoutes from "./routes/policies.js";
 import claimRoutes from "./routes/claims.js";
 import adminRoutes from "./routes/admin.js";
-import { startTriggerMonitor } from "./jobs/triggerMonitor.js";
-import { startTriggerWorker } from "./jobs/triggerWorker.js";
+// ❌ REMOVED Redis-related imports
+// import { startTriggerMonitor } from "./jobs/triggerMonitor.js";
+// import { startTriggerWorker } from "./jobs/triggerWorker.js";
 import logger from "./logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,7 +45,7 @@ requireEnv("JWT_SECRET");
 const app = express();
 const server = http.createServer(app);
 
-// ✅ CORS FIX (ONLY ONCE)
+// CORS
 const clientOrigins = process.env.CLIENT_ORIGIN
   ? process.env.CLIENT_ORIGIN.split(",")
   : ["http://localhost:5173", "http://127.0.0.1:5173"];
@@ -117,14 +118,14 @@ const PORT = Number(process.env.PORT) || 5000;
 // DB connect
 try {
   await connectDB();
-  logger.info("MongoDB connected"); // 👈 added clear log
+  logger.info("MongoDB connected");
 } catch (e) {
   logger.error("[startup] MongoDB connection failed:", e?.message || e);
   process.exit(1);
 }
 
-// Start jobs
-startTriggerMonitor(io);
+// ❌ REMOVED Redis jobs completely
+// startTriggerMonitor(io);
 // startTriggerWorker(io);
 
 // Start server
