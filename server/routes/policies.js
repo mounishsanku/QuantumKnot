@@ -141,8 +141,18 @@ router.post("/create", authMiddleware, async (req, res) => {
  *                 policy:
  *                   $ref: '#/components/schemas/Policy'
  */
-router.get("/active", authMiddleware, async (req, res) => {
+/**
+ * @swagger
+ * /api/policies/my-policy:
+ *   get:
+ *     summary: Alias for /active (User preferred naming)
+ *     tags: [Policies]
+ *     security:
+ *       - bearerAuth: []
+ */
+const getActivePolicy = async (req, res) => {
   try {
+    logger.info(`[policies] Fetching active policy for rider: ${req.user?.id}`);
     const policy = await Policy.findOne({ riderId: req.user.id, status: "active" }).sort({
       startDate: -1,
     });
@@ -151,8 +161,12 @@ router.get("/active", authMiddleware, async (req, res) => {
     }
     res.json({ policy });
   } catch (err) {
+    logger.error(`[policies] Fetch failed: ${err.message}`);
     res.status(500).json({ message: err.message || "Failed to load policy" });
   }
-});
+};
+
+router.get("/active", authMiddleware, getActivePolicy);
+router.get("/my-policy", authMiddleware, getActivePolicy);
 
 export default router;

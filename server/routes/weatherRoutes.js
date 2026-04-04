@@ -23,6 +23,7 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     const q = req.query.q || "Hyderabad,IN";
+    logger.info(`[weather] Received request for: ${q}`);
     const key = process.env.OPENWEATHER_API_KEY;
     
     if (!key || key === "your_real_key") {
