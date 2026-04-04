@@ -51,12 +51,14 @@ api.interceptors.response.use(
     }
 
     const { status, data, config } = error.response;
+    const url = config.url?.toLowerCase() || "";
 
     /**
-     * CRITICAL: Route-based skip for public APIs
+     * CRITICAL: Robust route-based skip for public APIs
      * We don't want to show "Session expired" for public routes like weather
      */
-    if (config.url.includes("/weather")) {
+    if (url.includes("/weather") || url.includes("/health")) {
+      console.log(`[api] Ignoring ${status} for public route: ${url}`);
       return Promise.reject(error);
     }
 

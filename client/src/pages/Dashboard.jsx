@@ -50,7 +50,7 @@ export default function Dashboard() {
       setLoading(true);
       try {
         const [pRes, cRes] = await Promise.all([
-          api.get("/api/policies/my-policy"),
+          api.get("/api/policies/active"),
           api.get("/api/claims/my-claims"),
         ]);
         setPolicy(pRes.data.policy);
