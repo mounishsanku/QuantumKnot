@@ -5,16 +5,21 @@ import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import cors from "cors";
+import helmet from "helmet";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/auth.js";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
 import policyRoutes from "./routes/policies.js";
 import claimRoutes from "./routes/claims.js";
 import adminRoutes from "./routes/admin.js";
 // ❌ REMOVED Redis-related imports
 // import { startTriggerMonitor } from "./jobs/triggerMonitor.js";
 // import { startTriggerWorker } from "./jobs/triggerWorker.js";
+import { globalLimiter, authLimiter } from "./middleware/rateLimiter.js";
+import mongoose from "mongoose";
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import logger from "./logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,7 +45,8 @@ function requireEnv(name) {
 }
 
 requireEnv("MONGODB_URI");
-requireEnv("JWT_SECRET");
+requireEnv("JWT_ACCESS_SECRET");
+requireEnv("JWT_REFRESH_SECRET");
 
 const app = express();
 const server = http.createServer(app);
@@ -51,6 +57,8 @@ const clientOrigins = [
   "https://quantum-knot.vercel.app"
 ];
 
+// Security setup
+app.use(helmet());
 app.use(
   cors({
     origin: clientOrigins,
@@ -58,7 +66,9 @@ app.use(
   })
 );
 
+app.use(globalLimiter);
 app.use(express.json());
+app.use(cookieParser());
 
 // Socket setup
 const io = new Server(server, {
@@ -70,7 +80,7 @@ io.use((socket, next) => {
     const token = socket.handshake.auth?.token || socket.handshake.query?.token;
     if (!token) return next(new Error("Unauthorized"));
 
-    const decoded = jwt.verify(String(token), process.env.JWT_SECRET);
+    const decoded = jwt.verify(String(token), process.env.JWT_ACCESS_SECRET);
     socket.join(`rider:${decoded.id}`);
     socket.data.riderId = decoded.id;
 
@@ -100,19 +110,32 @@ app.use((req, _res, next) => {
 
 // Routes
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "TriggrPay API" });
+  const uptime = process.uptime();
+  const memory = process.memoryUsage();
+  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+
+  res.json({
+    status: "ok",
+    service: "TriggrPay API",
+    timestamp: new Date().toISOString(),
+    uptime: `${Math.floor(uptime / 60)}m ${Math.floor(uptime % 60)}s`,
+    database: dbStatus,
+    memory: {
+      rss: `${Math.round(memory.rss / 1024 / 1024 * 100) / 100} MB`,
+      heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024 * 100) / 100} MB`,
+      heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024 * 100) / 100} MB`,
+    },
+  });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Error handler
-app.use((err, _req, res, _next) => {
-  logger.error("[express]", err.stack || err.message);
-  res.status(500).json({ message: err.message || "Internal server error" });
-});
+// Error handling
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = Number(process.env.PORT) || 5000;
 
