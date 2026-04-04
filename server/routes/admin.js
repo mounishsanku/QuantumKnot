@@ -3,7 +3,7 @@ import Rider from "../models/Rider.js";
 import Policy from "../models/Policy.js";
 import Claim from "../models/Claim.js";
 import { processTrigger } from "../services/triggerEngine.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 import logger from "../logger.js";
 import { io } from "../index.js";
 

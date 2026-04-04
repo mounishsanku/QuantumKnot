@@ -1,6 +1,18 @@
 import jwt from "jsonwebtoken";
+import Rider from "../models/Rider.js";
 
-export const authMiddleware = (req, res, next) => {
+/**
+ * Unified Authentication Middleware
+ * 
+ * 1. Checks for Authorization: Bearer <token>
+ * 2. Verifies using JWT_ACCESS_SECRET
+ * 3. populates both req.user and req.rider for compatibility
+ * 
+ * Errors:
+ * - 401: Token missing or malformed
+ * - 403: Token invalid or expired
+ */
+export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -11,12 +23,20 @@ export const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    req.user = decoded;
+    
+    // Fetch rider data to populate req objects
+    const rider = await Rider.findById(decoded.id).select("-password");
+    if (!rider) {
+      return res.status(403).json({ message: "User no longer exists" });
+    }
+
+    // Attach to both properties as requested
+    req.user = rider;
+    req.rider = rider;
+    
     next();
   } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Access token expired" });
-    }
-    return res.status(401).json({ message: "Invalid access token" });
+    // If token is invalid or expired, return 403 Forbidden as per request
+    return res.status(403).json({ message: "Invalid or expired access token" });
   }
 };
