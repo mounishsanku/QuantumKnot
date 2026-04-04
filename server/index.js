@@ -12,20 +12,21 @@ import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import policyRoutes from "./routes/policies.js";
 import claimRoutes from "./routes/claims.js";
 import adminRoutes from "./routes/admin.js";
 import weatherRoutes from "./routes/weatherRoutes.js";
-// ❌ REMOVED Redis-related imports
-// import { startTriggerMonitor } from "./jobs/triggerMonitor.js";
-// import { startTriggerWorker } from "./jobs/triggerWorker.js";
+
 import { globalLimiter, authLimiter } from "./middleware/rateLimiter.js";
 import mongoose from "mongoose";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import logger from "./logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ================= ENV LOADING =================
 const rootEnvPath = path.join(__dirname, "..", ".env");
 const serverEnvPath = path.join(__dirname, ".env");
 
@@ -36,12 +37,11 @@ if (fs.existsSync(serverEnvPath)) {
   dotenv.config({ path: serverEnvPath });
 }
 
+// ================= ENV VALIDATION =================
 function requireEnv(name) {
   const v = process.env[name];
   if (!v || !String(v).trim()) {
-    logger.error(
-      `[env] ${name} is missing or empty. Create ${rootEnvPath} with ${name}=...`
-    );
+    logger.error(`[env] ${name} is missing or empty`);
     process.exit(1);
   }
   return String(v).trim();
@@ -51,17 +51,24 @@ requireEnv("MONGODB_URI");
 requireEnv("JWT_ACCESS_SECRET");
 requireEnv("JWT_REFRESH_SECRET");
 
+// ⚠️ Optional but recommended
+if (!process.env.OPENWEATHER_API_KEY) {
+  logger.warn("[env] OPENWEATHER_API_KEY is missing (weather will fail)");
+}
+
+// ================= APP INIT =================
 const app = express();
 const server = http.createServer(app);
 
+// ================= SECURITY =================
 const clientOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-  "https://quantum-knot.vercel.app"
+  "https://quantum-knot.vercel.app",
 ];
 
-// Security setup
 app.use(helmet());
+
 app.use(
   cors({
     origin: clientOrigins,
@@ -69,21 +76,29 @@ app.use(
   })
 );
 
+// ================= MIDDLEWARE =================
 app.use(globalLimiter);
 app.use(express.json());
 app.use(cookieParser());
 
-// Socket setup
+// ================= SOCKET.IO =================
 const io = new Server(server, {
-  cors: { origin: clientOrigins, methods: ["GET", "POST"], credentials: true },
+  cors: {
+    origin: clientOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 io.use((socket, next) => {
   try {
-    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+    const token =
+      socket.handshake.auth?.token || socket.handshake.query?.token;
+
     if (!token) return next(new Error("Unauthorized"));
 
-    const decoded = jwt.verify(String(token), process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
     socket.join(`rider:${decoded.id}`);
     socket.data.riderId = decoded.id;
 
@@ -98,24 +113,31 @@ io.on("connection", (socket) => {
   socket.emit("connected", { ok: true });
 });
 
-// Logging
+// ================= REQUEST LOGGING =================
 app.use((req, _res, next) => {
   if (req.originalUrl === "/api/health") return next();
 
   const safeBody =
     req.body && typeof req.body === "object"
-      ? { ...req.body, password: req.body.password ? "[redacted]" : undefined }
+      ? {
+        ...req.body,
+        password: req.body.password ? "[redacted]" : undefined,
+      }
       : req.body;
 
-  logger.info(`[http] ${req.method} ${req.originalUrl}`, { body: safeBody });
+  logger.info(`[http] ${req.method} ${req.originalUrl}`, {
+    body: safeBody,
+  });
+
   next();
 });
 
-// Routes
+// ================= HEALTH =================
 app.get("/api/health", (_req, res) => {
   const uptime = process.uptime();
   const memory = process.memoryUsage();
-  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+  const dbStatus =
+    mongoose.connection.readyState === 1 ? "connected" : "disconnected";
 
   res.json({
     status: "ok",
@@ -124,34 +146,41 @@ app.get("/api/health", (_req, res) => {
     uptime: `${Math.floor(uptime / 60)}m ${Math.floor(uptime % 60)}s`,
     database: dbStatus,
     memory: {
-      rss: `${Math.round(memory.rss / 1024 / 1024 * 100) / 100} MB`,
-      heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024 * 100) / 100} MB`,
-      heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024 * 100) / 100} MB`,
+      rss: `${Math.round(memory.rss / 1024 / 1024)} MB`,
+      heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024)} MB`,
+      heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024)} MB`,
     },
   });
 });
 
+// ================= DOCS =================
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// API Routes
+// ================= CACHE CONTROL =================
 app.use((req, res, next) => {
-  res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
   next();
 });
 
+// ================= ROUTES =================
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminRoutes);
+
+// 🔥 IMPORTANT: weather should be PUBLIC
 app.use("/api/weather", weatherRoutes);
 
-// Error handling
+// ================= ERROR HANDLING =================
 app.use(notFound);
 app.use(errorHandler);
 
+// ================= START SERVER =================
 const PORT = Number(process.env.PORT) || 5000;
 
-// DB connect
 try {
   await connectDB();
   logger.info("MongoDB connected");
@@ -160,13 +189,8 @@ try {
   process.exit(1);
 }
 
-// ❌ REMOVED Redis jobs completely
-// startTriggerMonitor(io);
-// startTriggerWorker(io);
-
-// Start server
 server.listen(PORT, () => {
-  logger.info(`Server listening on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
 
 export { io };

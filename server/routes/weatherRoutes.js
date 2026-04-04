@@ -65,10 +65,15 @@ router.get("/", async (req, res) => {
     logger.info(`[weather] Successfully fetched for ${q}: ${response.temp}°C`);
     res.json(response);
   } catch (err) {
-    const status = err.response?.status || 500;
+    const rawStatus = err.response?.status || 500;
     const msg = err.response?.data?.message || err.message;
-    logger.error(`[weather] Proxy failed: ${msg}`);
-    res.status(status).json({ message: `Weather proxy error: ${msg}` });
+    
+    // CRITICAL: We map 401/403 from external API to 500
+    // so we don't trigger the frontend's "Session expired" logout interceptor.
+    const status = (rawStatus === 401 || rawStatus === 403) ? 500 : rawStatus;
+    
+    logger.error(`[weather] External API failed (${rawStatus}): ${msg}`);
+    res.status(status).json({ message: `Weather service error: ${msg}` });
   }
 });
 
