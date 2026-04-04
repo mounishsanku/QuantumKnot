@@ -28,7 +28,7 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await api.post("/api/auth/login", data);
-      setAuth(res.data.token, res.data.rider);
+      setAuth(res.data.accessToken, res.data.rider);
       toast.success("Welcome back!");
       navigate("/dashboard");
     } catch (e) {

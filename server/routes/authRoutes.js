@@ -119,6 +119,22 @@ router.post("/refresh", refresh);
 
 /**
  * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current rider profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current rider data
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/me", authMiddleware, getMe);
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     summary: Logout and clear cookies

@@ -104,6 +104,24 @@ export const register = async (req, res) => {
   }
 };
 
+export const getMe = async (req, res) => {
+  try {
+    // req.user is populated by authMiddleware
+    const rider = await Rider.findById(req.user.id);
+    if (!rider) {
+      return res.status(404).json({ message: "Rider not found" });
+    }
+
+    const riderObj = rider.toObject();
+    delete riderObj.password;
+
+    res.json({ rider: riderObj });
+  } catch (err) {
+    console.error("[authController/getMe] Error:", err.message);
+    res.status(500).json({ message: "Internal server error while fetching user" });
+  }
+};
+
 export const logout = (req, res) => {
   const { maxAge, ...clearOptions } = cookieOptions;
   res.clearCookie("refreshToken", clearOptions);
