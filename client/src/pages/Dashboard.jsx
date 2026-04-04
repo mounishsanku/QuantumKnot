@@ -339,7 +339,7 @@ export default function Dashboard() {
                 <p className="text-white/70 text-sm">Add VITE_OPENWEATHERMAP_KEY to show live weather.</p>
               ) : (
                 <ul className="text-sm space-y-2 text-white">
-                  <li>Temperature: {weather.temp?.toFixed(1)}°C</li>
+                  <li>Temperature: {typeof weather.temp === 'number' ? weather.temp.toFixed(1) : weather.temp}°C</li>
                   <li>Rain (1h): {weather.rain} mm</li>
                   <li>AQI band: {aqiLabel}</li>
                 </ul>
