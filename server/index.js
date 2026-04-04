@@ -26,18 +26,14 @@ import logger from "./logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// ================= ENV LOADING =================
+/* ================= ENV LOADING ================= */
 const rootEnvPath = path.join(__dirname, "..", ".env");
 const serverEnvPath = path.join(__dirname, ".env");
 
-if (fs.existsSync(rootEnvPath)) {
-  dotenv.config({ path: rootEnvPath });
-}
-if (fs.existsSync(serverEnvPath)) {
-  dotenv.config({ path: serverEnvPath });
-}
+if (fs.existsSync(rootEnvPath)) dotenv.config({ path: rootEnvPath });
+if (fs.existsSync(serverEnvPath)) dotenv.config({ path: serverEnvPath });
 
-// ================= ENV VALIDATION =================
+/* ================= ENV VALIDATION ================= */
 function requireEnv(name) {
   const v = process.env[name];
   if (!v || !String(v).trim()) {
@@ -51,16 +47,16 @@ requireEnv("MONGODB_URI");
 requireEnv("JWT_ACCESS_SECRET");
 requireEnv("JWT_REFRESH_SECRET");
 
-// ⚠️ Optional but recommended
+// Optional (warn only)
 if (!process.env.OPENWEATHER_API_KEY) {
-  logger.warn("[env] OPENWEATHER_API_KEY is missing (weather will fail)");
+  logger.warn("[env] OPENWEATHER_API_KEY missing → weather will fail");
 }
 
-// ================= APP INIT =================
+/* ================= APP INIT ================= */
 const app = express();
 const server = http.createServer(app);
 
-// ================= SECURITY =================
+/* ================= SECURITY ================= */
 const clientOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
@@ -76,12 +72,12 @@ app.use(
   })
 );
 
-// ================= MIDDLEWARE =================
+/* ================= MIDDLEWARE ================= */
 app.use(globalLimiter);
 app.use(express.json());
 app.use(cookieParser());
 
-// ================= SOCKET.IO =================
+/* ================= SOCKET.IO ================= */
 const io = new Server(server, {
   cors: {
     origin: clientOrigins,
@@ -99,11 +95,16 @@ io.use((socket, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-    socket.join(`rider:${decoded.id}`);
-    socket.data.riderId = decoded.id;
+    const userId = decoded.id || decoded._id;
+
+    if (!userId) return next(new Error("Invalid token"));
+
+    socket.join(`rider:${userId}`);
+    socket.data.riderId = userId;
 
     next();
-  } catch {
+  } catch (err) {
+    logger.error(`[socket] Auth failed: ${err.message}`);
     next(new Error("Unauthorized"));
   }
 });
@@ -113,7 +114,7 @@ io.on("connection", (socket) => {
   socket.emit("connected", { ok: true });
 });
 
-// ================= REQUEST LOGGING =================
+/* ================= REQUEST LOGGING ================= */
 app.use((req, _res, next) => {
   if (req.originalUrl === "/api/health") return next();
 
@@ -132,7 +133,7 @@ app.use((req, _res, next) => {
   next();
 });
 
-// ================= HEALTH =================
+/* ================= HEALTH ================= */
 app.get("/api/health", (_req, res) => {
   const uptime = process.uptime();
   const memory = process.memoryUsage();
@@ -153,10 +154,10 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// ================= DOCS =================
+/* ================= DOCS ================= */
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ================= CACHE CONTROL =================
+/* ================= CACHE CONTROL ================= */
 app.use((req, res, next) => {
   res.set(
     "Cache-Control",
@@ -165,20 +166,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// ================= ROUTES =================
+/* ================= ROUTES ================= */
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/policies", policyRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminRoutes);
 
-// 🔥 IMPORTANT: weather should be PUBLIC
+// ✅ WEATHER MUST BE PUBLIC
 app.use("/api/weather", weatherRoutes);
 
-// ================= ERROR HANDLING =================
+/* ================= ERROR HANDLING ================= */
 app.use(notFound);
 app.use(errorHandler);
 
-// ================= START SERVER =================
+/* ================= START SERVER ================= */
 const PORT = Number(process.env.PORT) || 5000;
 
 try {
