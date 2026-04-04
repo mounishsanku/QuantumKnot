@@ -23,10 +23,10 @@ const router = Router();
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const q = req.query.q || "Hyderabad,IN";
-    const key = process.env.OPENWEATHER_API_KEY || process.env.VITE_OPENWEATHERMAP_KEY;
+    const key = process.env.OPENWEATHER_API_KEY;
     
-    if (!key || key === "your_openai_api_key_here") {
-      return res.status(500).json({ message: "Weather API key not configured on server" });
+    if (!key || key === "your_real_key") {
+      return res.status(500).json({ message: "Weather API key not configured on server. Please set OPENWEATHER_API_KEY in .env" });
     }
 
     // 1. Fetch Current Weather

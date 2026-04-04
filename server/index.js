@@ -16,6 +16,7 @@ import authRoutes from "./routes/authRoutes.js";
 import policyRoutes from "./routes/policies.js";
 import claimRoutes from "./routes/claims.js";
 import adminRoutes from "./routes/admin.js";
+import weatherRoutes from "./routes/weatherRoutes.js";
 // ❌ REMOVED Redis-related imports
 // import { startTriggerMonitor } from "./jobs/triggerMonitor.js";
 // import { startTriggerWorker } from "./jobs/triggerWorker.js";
