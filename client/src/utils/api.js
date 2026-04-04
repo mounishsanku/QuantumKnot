@@ -52,19 +52,17 @@ api.interceptors.response.use(
      * - Status 403: Do NOT Logout (per instruction)
      */
     if (status === 401) {
-      if (!isRedirecting) {
+      if (!isRedirecting && window.location.pathname !== "/login") {
         isRedirecting = true;
-        localStorage.clear();
+        // ONLY clear if we are not already trying to log in
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         
-        if (window.location.pathname !== "/login") {
-          toast.error("Session expired. Please log in again.");
-          
-          setTimeout(() => {
-            window.location.replace("/login");
-          }, 800);
-        } else {
-          isRedirecting = false;
-        }
+        toast.error("Session expired. Please log in again.");
+        
+        setTimeout(() => {
+          window.location.replace("/login");
+        }, 800);
       }
     }
 

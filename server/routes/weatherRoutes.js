@@ -20,7 +20,7 @@ const router = Router();
  *           type: string
  *         example: Hyderabad,IN
  */
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const q = req.query.q || "Hyderabad,IN";
     const key = process.env.OPENWEATHER_API_KEY;
@@ -50,16 +50,19 @@ router.get("/", authMiddleware, async (req, res) => {
       logger.warn(`[weather] AQI fetch failed: ${aqiErr.message}`);
     }
 
-    // 3. Combine Response
-    res.json({
-      city: weatherData.name,
-      temp: weatherData.main?.temp,
-      rain: (weatherData.rain && weatherData.rain["1h"]) || 0,
+    // 3. Combine Response with safety defaults
+    const response = {
+      city: weatherData.name || "Unknown",
+      temp: typeof weatherData.main?.temp === 'number' ? weatherData.main.temp : null,
+      rain: (weatherData.rain && typeof weatherData.rain["1h"] === 'number') ? weatherData.rain["1h"] : 0,
       aqiLabel: aqi,
       coord: weatherData.coord,
-      description: weatherData.weather?.[0]?.description,
+      description: weatherData.weather?.[0]?.description || "No description",
       status: "success"
-    });
+    };
+
+    logger.info(`[weather] Successfully fetched for ${q}: ${response.temp}°C`);
+    res.json(response);
   } catch (err) {
     const status = err.response?.status || 500;
     const msg = err.response?.data?.message || err.message;
