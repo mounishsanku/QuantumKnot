@@ -3,44 +3,43 @@ import toast from "react-hot-toast";
 
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-/**
- * Global API Instance: Final Hardened Version
- * 
- * - Unifies redirect logic based on CRITICAL requirements
- * - ONLY log out on 401 (Missing Token)
- * - DO NOT log out on 403 (Invalid/Expired)
- */
 export const api = axios.create({
   baseURL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
 
-// Flag to prevent multiple redirects during concurrent 401s
+// Prevent multiple redirects
 let isRedirecting = false;
 
-// Request Interceptor: Attach token + Debug Log
+// =========================
+// 🔥 REQUEST INTERCEPTOR
+// =========================
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    // CRITICAL: Skip Auth for public requests
-    if (config.isPublic || config.url.includes("/weather")) {
+
+    // Skip auth for public routes
+    if (config.isPublic || config.url?.includes("/weather")) {
       console.log("TOKEN: SKIPPING (Public Request)");
       return config;
     }
 
-    // CRITICAL: Debug log requested by user
     console.log("TOKEN:", token);
 
+    // Attach token only if valid
     if (token && token !== "null" && token !== "undefined") {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Strict Logout Logic
+// =========================
+// 🔥 RESPONSE INTERCEPTOR
+// =========================
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -52,40 +51,50 @@ api.interceptors.response.use(
     const { status, data, config } = error.response;
     const url = config.url?.toLowerCase() || "";
 
-    /**
-     * CRITICAL: Robust route-based skip for public APIs
-     * We don't want to show "Session expired" for public routes like weather
-     */
+    // 🔒 Ignore public APIs
     if (url.includes("/weather") || url.includes("/health")) {
       console.log(`[api] Ignoring ${status} for public route: ${url}`);
       return Promise.reject(error);
     }
 
-    /**
-     * CRITICAL: Strict Logout Filter
-     * - Status 401: Clear and redirect to login
-     * - Status 403: Do NOT Logout (per instruction)
-     */
+    // =========================
+    // 🔥 FIXED 401 LOGIC
+    // =========================
     if (status === 401) {
-      if (!isRedirecting && window.location.pathname !== "/login") {
-        isRedirecting = true;
-        // ONLY clear if we are not already trying to log in
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+      console.warn("401 received from:", url);
 
-        toast.error("Session expired. Please log in again.");
+      // ❗ ONLY logout if it's auth-related
+      if (url.includes("/auth")) {
+        if (!isRedirecting && window.location.pathname !== "/login") {
+          isRedirecting = true;
 
-        setTimeout(() => {
-          window.location.replace("/login");
-        }, 800);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+
+          toast.error("Session expired. Please log in again.");
+
+          setTimeout(() => {
+            window.location.replace("/login");
+          }, 800);
+        }
+      } else {
+        // ✅ DO NOT logout for normal API failures
+        console.warn("Ignoring 401 for non-auth route:", url);
       }
     }
 
-    // Inform user of error without logging out for 403 or 500
+    // =========================
+    // 🔥 403 (ADMIN BLOCK)
+    // =========================
     if (status === 403) {
-      // Prevent toast spam for admin-only endpoints
-      console.warn("Admin access required:", data?.message || "Forbidden");
-    } else if (status >= 500) {
+      console.warn("Forbidden:", data?.message || "Admin access required");
+      toast.error(data?.message || "Access denied");
+    }
+
+    // =========================
+    // 🔥 SERVER ERRORS
+    // =========================
+    if (status >= 500) {
       toast.error(data?.message || "Internal server error");
     }
 
@@ -93,6 +102,9 @@ api.interceptors.response.use(
   }
 );
 
+// =========================
+// 🔌 SOCKET URL
+// =========================
 export function getSocketUrl() {
   return baseURL.replace(/^http/, "ws");
 }
