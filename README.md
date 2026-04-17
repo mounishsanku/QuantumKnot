@@ -322,24 +322,24 @@ TriggrPay/
 - [x] 2-minute demo video
 
 ### Phase 2 🔄 — Scale (March 21–April 4)
-- [ ] MongoDB Atlas + all Mongoose schemas
-- [ ] Express REST API — registration + auth
-- [ ] Insurance policy management
-- [ ] Dynamic XGBoost premium calculation
-- [ ] 5 live parametric triggers (OpenWeatherMap)
-- [ ] Claims management module
-- [ ] Razorpay sandbox UPI payout
-- [ ] EarningsSync MVP
-- [ ] Socket.io real-time notifications
-- [ ] 2-minute demo video
+- [x] MongoDB Atlas + all Mongoose schemas
+- [x] Express REST API — registration + auth
+- [x] Insurance policy management
+- [x] Dynamic XGBoost premium calculation
+- [x] 5 live parametric triggers (OpenWeatherMap)
+- [x] Claims management module
+- [x] Razorpay sandbox UPI payout
+- [x] EarningsSync MVP
+- [x] Socket.io real-time notifications
+- [x] 2-minute demo video
 
 ### Phase 3 — Soar (April 5–17)
-- [ ] Full Isolation Forest fraud detection
-- [ ] GPS spoofing detection
-- [ ] Worker + Admin dashboards with Recharts
-- [ ] Festival Predictor live model
-- [ ] GeoShift auto-repricing
-- [ ] Final 5-minute demo video + pitch deck
+- [x] Full Isolation Forest fraud detection
+- [x] GPS spoofing detection
+- [x] Worker + Admin dashboards with Recharts
+- [x] Festival Predictor live model
+- [x] GeoShift auto-repricing
+- [x] Final 5-minute demo video + pitch deck
 
 ---
 
@@ -368,7 +368,7 @@ TriggrPay aims to:
 ## 📎 Links
 
 - 🎥 Demo Video: *(add YouTube link)*
-- 🌐 Live Prototype: [triggrpay-quantum-knot.base44.app](https://triggrpay-quantum-knot.base44.app)
+- 🌐 Live app: [triggrpay-quantum-knot](https://youtu.be/0MRvHf7ilm8)
 - 📄 Pitch Deck: *(Phase 3)*
 
 ---
