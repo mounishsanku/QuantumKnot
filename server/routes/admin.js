@@ -172,7 +172,7 @@ router.post("/simulate-trigger", async (req, res) => {
   }
 });
 // 🚀 FORCE SIMULATION
-import { authMiddleware } from "../middleware/authMiddleware.js";
+
 
 router.post("/simulate-trigger", authMiddleware, async (req, res) => {
   try {
