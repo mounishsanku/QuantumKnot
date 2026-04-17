@@ -131,7 +131,18 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                {rider?.role === "admin" ? (
+                  <PageWrapper><AdminDashboard /></PageWrapper>
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )}
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="*"
             element={<Navigate to={token && rider ? "/dashboard" : "/login"} replace />}

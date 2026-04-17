@@ -66,11 +66,19 @@ export default function Dashboard() {
   }, [token, rider]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      console.log("Skipping socket connection (no token)");
+      return;
+    }
     const socket = socketIo(API_BASE, {
       auth: { token },
       transports: ["websocket", "polling"],
     });
+
+    socket.on("connect_error", () => {
+      console.log("[SOCKET] Connection skipped or failed safely");
+    });
+
     socket.on("payout:completed", () => {
       toast.success("Payout completed!");
       api.get("/api/claims/my-claims").then((r) => setClaims(r.data.claims || []));
@@ -86,6 +94,10 @@ export default function Dashboard() {
 
   /* ── Trigger simulator ── */
   const simulateTrigger = useCallback(async (triggerType) => {
+    if (rider?.role !== "admin") {
+      toast.error("Admin access required for simulation");
+      return;
+    }
     setSimulating(triggerType);
     setSimResult(null);
     const loadingToast = toast.loading("Processing trigger...");
@@ -259,6 +271,14 @@ export default function Dashboard() {
                 Active policy
               </span>
             )}
+            {rider?.role === "admin" && (
+              <button 
+                onClick={() => window.location.href = "/admin"}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/15 border border-purple-500/40 text-purple-400 text-sm font-semibold hover:bg-purple-500/20 transition-colors"
+              >
+                Go to Admin Panel
+              </button>
+            )}
           </div>
         </section>
 
@@ -427,23 +447,29 @@ export default function Dashboard() {
               </motion.span>
             )}
           </div>
-          <div className="flex flex-wrap gap-3">
-            {["rainfall", "heat", "strike"].map((t) => (
-              <button
-                key={t}
-                type="button"
-                disabled={!!simulating}
-                onClick={() => simulateTrigger(t)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-300 ${
-                  simulating === t
-                    ? "bg-blue-500/20 border-blue-500/40 text-blue-400 animate-pulse"
-                    : "border-white/15 bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/30 text-white hover:text-blue-400"
-                } disabled:opacity-50`}
-              >
-                {simulating === t ? "Processing…" : `⚡ Simulate ${t.charAt(0).toUpperCase() + t.slice(1)}`}
-              </button>
-            ))}
-          </div>
+          {rider?.role === "admin" ? (
+            <div className="flex flex-wrap gap-3">
+              {["rainfall", "heat", "strike"].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  disabled={!!simulating}
+                  onClick={() => simulateTrigger(t)}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-300 ${
+                    simulating === t
+                      ? "bg-blue-500/20 border-blue-500/40 text-blue-400 animate-pulse"
+                      : "border-white/15 bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/30 text-white hover:text-blue-400"
+                  } disabled:opacity-50`}
+                >
+                  {simulating === t ? "Processing…" : `⚡ Simulate ${t.charAt(0).toUpperCase() + t.slice(1)}`}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 rounded-xl border border-dashed border-white/10 text-center">
+              <p className="text-sm text-white/40 italic">Simulation tools available for authorized admins only</p>
+            </div>
+          )}
         </motion.section>
 
         {/* ── Activity Feed ── */}
@@ -472,11 +498,20 @@ export default function Dashboard() {
                   const type = item.type;
                   const tType = item.triggerType?.charAt(0).toUpperCase() + item.triggerType?.slice(1);
                   
-                  if (type === "trigger_detected") return `Disruption detected: ${tType} in ${item.city}`;
-                  if (type === "fraud_check_started") return `Fraud-resistant payout engine: Initializing checks...`;
-                  if (type === "fraud_check_completed") return `Fraud check passed (Score: ${item.fraudScore || 0})`;
-                  if (type === "payout_processing") return `Earnings-based intelligence: Calculating ₹${item.payoutAmount || 0} payout`;
-                  if (type === "payout_completed") return `Success! ₹${item.payoutAmount || 0} transferred via UPI`;
+                  // Map triggerType to Source
+                  const sourceMap = {
+                    rainfall: "Weather API",
+                    heat: "Weather API",
+                    pollution: "IQAir API",
+                    strike: "News API",
+                  };
+                  const source = sourceMap[item.triggerType] || "Trigger Engine";
+
+                  if (type === "trigger_detected") return `[TRIGGER SOURCE: ${source}] ${tType} detected in ${item.city}`;
+                  if (type === "fraud_check_started") return `[SECURITY] Hardened fraud engine: Validating claim context...`;
+                  if (type === "fraud_check_completed") return `[FRAUD SCORE: ${item.fraudScore || 0}] Verification passed — Payout approved.`;
+                  if (type === "payout_processing") return `[PAYOUT STATUS: Processing] Calculating ₹${item.payoutAmount || 0} earnings-based coverage...`;
+                  if (type === "payout_completed") return `[PAYOUT STATUS: Success] ₹${item.payoutAmount || 0} transferred via RazorpayX (UPI)`;
                   return "Activity update";
                 };
 

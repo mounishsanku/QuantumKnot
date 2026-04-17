@@ -9,6 +9,12 @@ import { sendPayoutSuccessEmail } from "./emailService.js";
 import { sendPayoutSMS } from "./smsService.js";
 import mongoose from "mongoose";
 
+// New API Services
+import { getAQI } from "./airQualityService.js";
+import { detectDisruption } from "./newsService.js";
+import { validateLocation } from "./locationService.js";
+import { sendPayoutNotification } from "./notificationService.js";
+
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 function policyCoversTrigger(policy, triggerType) {
@@ -95,6 +101,16 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
       return null;
     }
 
+    if (!riderId || !triggerType || !zone) {
+      logger.warn(`[TRIGGER] Missing critical data: riderId=${riderId}, type=${triggerType}, zone=${zone}`);
+      return null;
+    }
+
+    const triggerSource = triggerType.toUpperCase();
+    console.log(`[TRIGGER] Source: ${triggerSource}`);
+    console.log(`[TRIGGER] Processing rider: ${riderId}`);
+    console.log(`[TRIGGER] Type: ${triggerType}`);
+
     // 1. Deduplication (Skip if force/simulation)
     if (!force) {
       const recentSame = await Claim.findOne({
@@ -138,6 +154,32 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
       }
     }
 
+    // --- PHASE 2: PRIORITY-BASED TRIGGER ENHANCEMENT ---
+    let finalTriggerType = triggerType; // rainfall / heat
+    let finalTriggerValue = triggerValue;
+
+    try {
+      // 1. NEWS CHECK (Highest Priority)
+      const news = await detectDisruption(zone || rider.city || "Global");
+      if (news.detected) {
+        finalTriggerType = "strike";
+        finalTriggerValue = `News Alert: ${news.type}`;
+      } else {
+        // 2. AQI CHECK (Second Priority)
+        const aqi = await getAQI(zone || rider.city || "Global");
+        if (aqi && aqi > 150) {
+          finalTriggerType = "pollution";
+          finalTriggerValue = `AQI: ${aqi}`;
+        }
+      }
+    } catch (err) {
+      logger.warn(`[trigger] Enhanced API check failed: ${err.message}`);
+    }
+
+    // Update variables for the rest of the flow
+    triggerType = finalTriggerType;
+    triggerValue = finalTriggerValue;
+
     // ── Simulation Start ──
     const safeNotify = (type, data = {}) => {
       if (io) {
@@ -161,10 +203,21 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
     let fraudScore = 15;
     try {
       fraudScore = await calculateFraudScore(riderId, triggerType);
+
+      // --- PHASE 2: LOCATION FRAUD SIGNAL ---
+      // Extract lat/lng from zone if available (assuming zone might sometimes be coords or we fallback to rider data)
+      // For this demo, we'll try to find lat/lng in the trigger context or use a safe check.
+      // Note: rider has city, but we need coords for a real check. 
+      // Assuming coordinates might come in the request or from a recent check.
+      const isValidLoc = await validateLocation(rider.lat, rider.lng, zone || rider.city);
+      if (isValidLoc === false) {
+        fraudScore += 30;
+      }
     } catch (e) {
       logger.error(`[trigger] Fraud calculation failed, using fallback score. Error: ${e.message}`);
     }
 
+    console.log(`[FRAUD] Final Score: ${fraudScore}`);
     safeNotify("fraud_check_completed", { fraudScore });
     await delay(600);
 
@@ -189,6 +242,7 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
     };
 
     const claim = await Claim.create(claimData);
+    console.log(`[CLAIM] Created | Rider: ${riderId} | Type: ${triggerType} | Amount: ${payoutAmount}`);
     logger.info(`[trigger] Claim ${claim._id} created for rider ${riderId} status=${claim.status}`);
 
     if (fraudScore >= 70) {
@@ -208,6 +262,9 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
       // Notifications (Fire and Forget - don't await/crash if these fail)
       sendPayoutSuccessEmail(rider, { ...claim.toObject(), transactionId }).catch(e => logger.error(`[trigger] Email failed: ${e.message}`));
       sendPayoutSMS(rider, { ...claim.toObject(), transactionId }).catch(e => logger.error(`[trigger] SMS failed: ${e.message}`));
+      
+      // Phase 2: SendGrid Notification
+      sendPayoutNotification(rider.email, payoutAmount).catch(e => logger.error(`[trigger] SendGrid failed: ${e.message}`));
 
       safeNotify("payout_completed", { payoutAmount, transactionId });
       if (io) {

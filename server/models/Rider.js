@@ -36,6 +36,11 @@ const riderSchema = new mongoose.Schema({
     default: "pending",
   },
   platforms: [{ type: String }],
+  role: {
+    type: String,
+    enum: ["rider", "admin"],
+    default: "rider",
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

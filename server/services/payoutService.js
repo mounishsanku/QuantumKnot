@@ -21,6 +21,8 @@ async function verifyRazorpayKeys() {
 export async function processPayout(claimId, riderId, amount, upiId) {
   try {
     const rounded = Math.round(amount * 100) / 100;
+    
+    // Create record in DB
     const payoutDoc = await Payout.create({
       claimId,
       riderId,
@@ -29,20 +31,28 @@ export async function processPayout(claimId, riderId, amount, upiId) {
       status: "processing",
     });
 
-    const keysOk = await verifyRazorpayKeys();
-    if (keysOk) {
-      logger.info("Razorpay API keys validated; recording demo payout (RazorpayX fund account required for live UPI transfers).");
-    }
+    // --- PHASE 2: SIMULATED PAYOUT ---
+    const timestamp = Date.now();
+    const transactionId = `txn_${timestamp}`;
+    const razorpayPayoutId = `payout_sim_${timestamp}`;
 
-    const transactionId = `txn_${crypto.randomBytes(14).toString("hex")}`;
-    const razorpayPayoutId = `rzp_test_${payoutDoc._id.toString()}`;
+    console.log("[PAYOUT] Simulated payout created");
 
-    payoutDoc.razorpayPayoutId = razorpayPayoutId;
-    payoutDoc.transactionId = transactionId;
-    payoutDoc.status = "completed";
-    await payoutDoc.save();
+    // AFTER 1.5 seconds: simulate success update (non-blocking)
+    setTimeout(async () => {
+      try {
+        payoutDoc.razorpayPayoutId = razorpayPayoutId;
+        payoutDoc.transactionId = transactionId;
+        payoutDoc.status = "completed";
+        await payoutDoc.save();
+        console.log("[PAYOUT] Status updated to success");
+      } catch (e) {
+        console.error("[PAYOUT SIM ERROR]", e.message);
+      }
+    }, 1500);
 
     return {
+      status: "processing",
       transactionId,
       razorpayPayoutId,
       payout: payoutDoc,

@@ -4,19 +4,24 @@ import Policy from "../models/Policy.js";
 import Claim from "../models/Claim.js";
 import { processTrigger } from "../services/triggerEngine.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { adminMiddleware } from "../middleware/adminMiddleware.js";
 import logger from "../logger.js";
-import { io } from "../index.js";
+
 
 const router = Router();
 
-// /api/admin/overview
+// 🔐 Apply globally
+router.use(authMiddleware, adminMiddleware);
+
+// 📊 OVERVIEW
 router.get("/overview", async (req, res) => {
   try {
     const totalUsers = await Rider.countDocuments();
     const totalPolicies = await Policy.countDocuments();
     const totalClaims = await Claim.countDocuments();
-    
+
     const claims = await Claim.find().select("payoutAmount status");
+
     const totalPayouts = claims
       .filter(c => c.status === "paid")
       .reduce((sum, c) => sum + (c.payoutAmount || 0), 0);
@@ -33,12 +38,14 @@ router.get("/overview", async (req, res) => {
       totalPayouts,
       recentClaims
     });
+
   } catch (err) {
+    logger.error(`[admin/overview] ${err.message}`);
     res.status(500).json({ message: err.message });
   }
 });
 
-// /api/admin/claims
+// 📄 CLAIMS
 router.get("/claims", async (req, res) => {
   try {
     const claims = await Claim.find()
@@ -46,108 +53,174 @@ router.get("/claims", async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json({ claims });
+
   } catch (err) {
+    logger.error(`[admin/claims] ${err.message}`);
     res.status(500).json({ message: err.message });
   }
 });
 
-/* ── Trigger simulation values ── */
+// ⚡ SIM VALUES
 const SIM_VALUES = {
   rainfall: "35mm/hr",
   heat: "45°C",
   strike: "city-wide",
 };
 
-// POST /api/admin/simulate — fire trigger for ALL active policyholders
+// 🌍 SIMULATE ALL USERS
 router.post("/simulate", async (req, res) => {
   try {
     const { triggerType } = req.body;
+
     if (!triggerType || !SIM_VALUES[triggerType]) {
-      return res.status(400).json({ message: "triggerType must be rainfall, heat, or strike" });
+      return res.status(400).json({
+        message: "triggerType must be rainfall, heat, or strike"
+      });
     }
 
-    const activePolicies = await Policy.find({ status: "active" }).select("riderId city").lean();
-    if (activePolicies.length === 0) {
+    const activePolicies = await Policy.find({ status: "active" })
+      .select("riderId city")
+      .lean();
+
+    if (!activePolicies.length) {
       return res.json({ message: "No active policies found", results: [] });
     }
 
     const results = [];
+
     for (const pol of activePolicies) {
       const riderId = String(pol.riderId);
-      logger.info(`[simulate] Firing ${triggerType} for rider ${riderId} in ${pol.city}`);
-      const claim = await processTrigger(io, riderId, triggerType, SIM_VALUES[triggerType], pol.city);
+
+      logger.info(`[simulate] ${triggerType} for rider ${riderId}`);
+
+      const claim = await processTrigger(
+        io,
+        riderId,
+        triggerType,
+        SIM_VALUES[triggerType],
+        pol.city
+      );
+
       if (claim) {
-        results.push({ riderId, claimId: claim._id, amount: claim.payoutAmount, status: claim.status });
+        results.push({
+          riderId,
+          claimId: claim._id,
+          amount: claim.payoutAmount,
+          status: claim.status
+        });
       }
     }
 
-    logger.info(`[simulate] Complete — ${results.length} claims created`);
-    res.json({ message: `Simulated ${triggerType} for ${activePolicies.length} riders`, results });
-  } catch (err) {
-    logger.error(`[simulate] Error: ${err.message}`);
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/admin/simulate-me — fire trigger for the LOGGED-IN user only (for dashboard button)
-router.post("/simulate-me", authMiddleware, async (req, res) => {
-  try {
-    const { triggerType } = req.body;
-    if (!triggerType || !SIM_VALUES[triggerType]) {
-      return res.status(400).json({ message: "triggerType must be rainfall, heat, or strike" });
-    }
-
-    const riderId = String(req.rider._id);
-    const rider = req.rider;
-    logger.info(`[simulate-me] Firing ${triggerType} for rider ${riderId}`);
-
-    const claim = await processTrigger(io, riderId, triggerType, SIM_VALUES[triggerType], rider.city);
-    if (!claim) {
-      return res.json({ message: "Trigger did not produce a claim (dedup, no policy, or low confidence)", claim: null });
-    }
-
     res.json({
-      message: `${triggerType} triggered successfully`,
-      claim: {
-        _id: claim._id,
-        triggerType: claim.triggerType,
-        payoutAmount: claim.payoutAmount,
-        status: claim.status,
-        explanation: claim.explanation,
-        fraudScore: claim.fraudScore,
-      },
+      message: `Simulated ${triggerType}`,
+      results
     });
+
   } catch (err) {
-    logger.error(`[simulate-me] Error: ${err.message}`);
+    logger.error(`[simulate] ${err.message}`);
     res.status(500).json({ message: err.message });
   }
 });
 
-// POST /api/admin/simulate-trigger — Force trigger for the demo (guaranteed claim)
-router.post("/simulate-trigger", authMiddleware, async (req, res) => {
+// 👤 SIMULATE ME
+router.post("/simulate-trigger", async (req, res) => {
   try {
-    const { triggerType } = req.body;
-    if (!triggerType || !SIM_VALUES[triggerType]) {
-      return res.status(400).json({ success: false, message: "triggerType must be rainfall, heat, or strike" });
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const riderId = String(req.rider._id);
-    const rider = req.rider;
-    logger.info(`[SIMULATION] Forced ${triggerType} for rider ${riderId}`);
+    const { triggerType } = req.body;
 
-    const claim = await processTrigger(io, riderId, triggerType, SIM_VALUES[triggerType], rider.city, true);
+    if (!triggerType || !SIM_VALUES[triggerType]) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid triggerType"
+      });
+    }
+
+    const riderId = req.user.id;
+    const rider = await Rider.findById(riderId);
+
+    if (!rider) {
+      return res.status(404).json({ message: "Rider not found" });
+    }
+
+    logger.info(`[simulation] ${triggerType} for ${riderId}`);
+
+    const claim = await processTrigger(
+      null, // 🔥 FIXED
+      riderId,
+      triggerType,
+      SIM_VALUES[triggerType],
+      rider.city,
+      true
+    );
 
     res.json({
       success: true,
       claimCreated: !!claim,
-      payoutAmount: claim ? claim.payoutAmount : 0,
-      claim: claim
+      payoutAmount: claim?.payoutAmount || 0,
+      claim
     });
+
   } catch (err) {
-    logger.error(`[SIMULATION ERROR] ${err.message}`);
-    res.status(500).json({ success: false, message: err.message });
+    logger.error(`[simulation error] ${err.message}`);
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+});
+// 🚀 FORCE SIMULATION
+import { authMiddleware } from "../middleware/authMiddleware.js";
+
+router.post("/simulate-trigger", authMiddleware, async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const { triggerType } = req.body;
+
+    if (!triggerType || !SIM_VALUES[triggerType]) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid triggerType"
+      });
+    }
+
+    const riderId = req.user.id;
+    const rider = await Rider.findById(req.user.id);
+
+    if (!rider) {
+      return res.status(404).json({ message: "Rider not found" });
+    }
+
+    logger.info(`[simulation] ${triggerType} for ${riderId}`);
+
+    const claim = await processTrigger(
+      io,
+      riderId,
+      triggerType,
+      SIM_VALUES[triggerType],
+      rider.city,
+      true
+    );
+
+    res.json({
+      success: true,
+      claimCreated: !!claim,
+      payoutAmount: claim?.payoutAmount || 0,
+      claim
+    });
+
+  } catch (err) {
+    logger.error(`[simulation error] ${err.message}`);
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
 export default router;
-

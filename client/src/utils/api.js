@@ -23,7 +23,6 @@ let isRedirecting = false;
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    
     // CRITICAL: Skip Auth for public requests
     if (config.isPublic || config.url.includes("/weather")) {
       console.log("TOKEN: SKIPPING (Public Request)");
@@ -33,7 +32,7 @@ api.interceptors.request.use(
     // CRITICAL: Debug log requested by user
     console.log("TOKEN:", token);
 
-    if (token) {
+    if (token && token !== "null" && token !== "undefined") {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -73,9 +72,9 @@ api.interceptors.response.use(
         // ONLY clear if we are not already trying to log in
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        
+
         toast.error("Session expired. Please log in again.");
-        
+
         setTimeout(() => {
           window.location.replace("/login");
         }, 800);
@@ -84,7 +83,8 @@ api.interceptors.response.use(
 
     // Inform user of error without logging out for 403 or 500
     if (status === 403) {
-      toast.error(data?.message || "Invalid or expired session access.");
+      // Prevent toast spam for admin-only endpoints
+      console.warn("Admin access required:", data?.message || "Forbidden");
     } else if (status >= 500) {
       toast.error(data?.message || "Internal server error");
     }

@@ -98,7 +98,7 @@ export default function Register() {
         upiId: d.upiId,
       };
       const res = await api.post("/api/auth/register", payload);
-      setAuth(res.data.accessToken, res.data.rider);
+      setAuth(res.data.token, res.data.user);
       toast.success("Account created!");
       navigate("/get-covered");
     } catch (e) {

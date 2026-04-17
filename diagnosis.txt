@@ -1,0 +1,27 @@
+﻿=== ROUTE FILES ===
+admin.js => PASS
+authRoutes.js => FAIL - no default export
+claims.js => PASS
+policies.js => PASS
+weatherRoutes.js => PASS
+
+=== CSS ORDER ===
+  L1: @tailwind base;
+  L2: @tailwind components;
+  L3: @tailwind utilities;
+  L4: 
+  L5: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+=== ENV FILES ===
+root .env: EXISTS
+server .env: MISSING
+client .env: EXISTS
+
+=== TRIGGER MONITOR ===
+processTrigger wired: NO
+triggerQueue present: YES - still referenced
+startTriggerMonitor exported: YES
+
+=== INDEX.JS ===
+startTriggerMonitor called: NO
+cookieParser imported: YES
