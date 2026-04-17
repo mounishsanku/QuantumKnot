@@ -28,7 +28,20 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await api.post("/api/auth/login", data);
-      setAuth(res.data.token, res.data.user);
+
+      // 🔥 FIX: correct field
+      const token = res.data.accessToken;
+
+      // 🔥 STORE TOKEN (CRITICAL)
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // 🔥 ALSO UPDATE STORE (if needed)
+      setAuth(token, res.data.user);
+
+      // 🔥 DEBUG (optional)
+      console.log("TOKEN SAVED:", token);
+
       toast.success("Welcome back!");
       navigate("/dashboard");
     } catch (e) {
@@ -41,7 +54,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-[#0A0A0A] to-[#0A0A0A]">
       <div className="w-full max-w-md z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -62,26 +75,26 @@ export default function Login() {
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
           <div className="relative z-10">
             <h2 className="text-xl font-semibold mb-4">Log in</h2>
-          <label className="block text-sm text-white/70 mb-1">Email</label>
-          <input
-            type="email"
-            autoComplete="email"
-            className="w-full rounded-xl bg-[#111111] border border-white/10 px-3 py-2 mb-1 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-            placeholder="you@example.com"
-            {...register("email")}
-          />
-          {errors.email && <p className="text-[#EF4444] text-xs mb-3">{errors.email.message}</p>}
+            <label className="block text-sm text-white/70 mb-1">Email</label>
+            <input
+              type="email"
+              autoComplete="email"
+              className="w-full rounded-xl bg-[#111111] border border-white/10 px-3 py-2 mb-1 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              placeholder="you@example.com"
+              {...register("email")}
+            />
+            {errors.email && <p className="text-[#EF4444] text-xs mb-3">{errors.email.message}</p>}
 
-          <label className="block text-sm text-white/70 mb-1 mt-2">Password</label>
-          <input
-            type="password"
-            autoComplete="current-password"
-            className="w-full rounded-xl bg-[#111111] border border-white/10 px-3 py-2 mb-1 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-            {...register("password")}
-          />
-          {errors.password && (
-            <p className="text-[#EF4444] text-xs mb-3">{errors.password.message}</p>
-          )}
+            <label className="block text-sm text-white/70 mb-1 mt-2">Password</label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              className="w-full rounded-xl bg-[#111111] border border-white/10 px-3 py-2 mb-1 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              {...register("password")}
+            />
+            {errors.password && (
+              <p className="text-[#EF4444] text-xs mb-3">{errors.password.message}</p>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(59,130,246,0.4)" }}
