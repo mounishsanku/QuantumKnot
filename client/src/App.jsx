@@ -9,7 +9,6 @@ import GetCovered from "./pages/GetCovered.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Claims from "./pages/Claims.jsx";
 import Landing from "./pages/Landing.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
 import { api } from "./utils/api.js";
 import { useStore } from "./store/useStore.js";
 
@@ -136,14 +135,7 @@ export default function App() {
             path="/admin"
             element={
               <ProtectedRoute>
-                {(() => {
-                  const user = JSON.parse(localStorage.getItem("user") || "{}");
-                  return user?.role === "admin" ? (
-                    <PageWrapper><AdminDashboard /></PageWrapper>
-                  ) : (
-                    <Navigate to="/dashboard" replace />
-                  );
-                })()}
+                <PageWrapper><Dashboard /></PageWrapper>
               </ProtectedRoute>
             }
           />

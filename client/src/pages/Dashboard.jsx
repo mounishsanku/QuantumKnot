@@ -44,7 +44,14 @@ export default function Dashboard() {
   const [simResult, setSimResult] = useState(null);
   const [decision, setDecision] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = (() => {
+    try {
+      const data = localStorage.getItem("user");
+      return data && data !== "undefined" ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  })();
   const isAdmin = user?.role === "admin";
   const [logs, setLogs] = useState([]);
   const [cityStats, setCityStats] = useState({});
