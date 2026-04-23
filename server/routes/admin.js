@@ -231,20 +231,25 @@ router.post("/simulate-bulk", async (req, res) => {
     const riders = await Rider.find().limit(count);
     const io = req.app.get("io");
 
-    for (const rider of riders) {
-      try {
-        await processTrigger(
-          io,
-          rider._id,
-          triggerType,
-          SIM_VALUES[triggerType] || "bulk_sim",
-          rider.city,
-          true // force simulation
-        );
-        await new Promise(r => setTimeout(r, 50)); // smooth demo
-      } catch (err) {
-        console.log("[SIM] Failed for rider:", rider._id);
-      }
+    const batchSize = 10;
+
+    for (let i = 0; i < riders.length; i += batchSize) {
+      const batch = riders.slice(i, i + batchSize);
+
+      await Promise.all(
+        batch.map((rider) =>
+          processTrigger(
+            io,
+            rider._id,
+            triggerType,
+            SIM_VALUES[triggerType] || "bulk_sim",
+            rider.city,
+            true // force simulation
+          ).catch((err) => {
+            console.log("[SIM] Failed for rider:", rider._id);
+          })
+        )
+      );
     }
 
     res.json({
