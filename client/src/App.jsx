@@ -135,7 +135,21 @@ export default function App() {
             path="/admin"
             element={
               <ProtectedRoute>
-                <PageWrapper><Dashboard /></PageWrapper>
+                {(() => {
+                  let user = null;
+                  try {
+                    const data = localStorage.getItem("user");
+                    user = data && data !== "undefined" ? JSON.parse(data) : null;
+                  } catch (e) {
+                    user = null;
+                  }
+                  
+                  return user?.role?.toLowerCase() === "admin" ? (
+                    <PageWrapper><Dashboard /></PageWrapper>
+                  ) : (
+                    <Navigate to="/dashboard" replace />
+                  );
+                })()}
               </ProtectedRoute>
             }
           />

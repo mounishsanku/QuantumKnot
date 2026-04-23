@@ -52,7 +52,7 @@ export default function Dashboard() {
       return null;
     }
   })();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const [logs, setLogs] = useState([]);
   const [cityStats, setCityStats] = useState({});
 
