@@ -223,4 +223,41 @@ router.post("/simulate-trigger", authMiddleware, async (req, res) => {
   }
 });
 
+// 🌊 BULK SIMULATION
+router.post("/simulate-bulk", async (req, res) => {
+  try {
+    const { count = 20, triggerType = "rainfall" } = req.body;
+
+    const riders = await Rider.find().limit(count);
+    const io = req.app.get("io");
+
+    for (const rider of riders) {
+      try {
+        await processTrigger(
+          io,
+          rider._id,
+          triggerType,
+          SIM_VALUES[triggerType] || "bulk_sim",
+          rider.city,
+          true // force simulation
+        );
+        await new Promise(r => setTimeout(r, 50)); // smooth demo
+      } catch (err) {
+        console.log("[SIM] Failed for rider:", rider._id);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Simulated ${riders.length} riders`
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Bulk simulation failed"
+    });
+  }
+});
+
 export default router;

@@ -43,19 +43,20 @@ export default function App() {
     const t = localStorage.getItem("token");
     if (!t) {
       setBooting(false);
-      setAuth(null, null); // Clear state if no token
+      setAuth(null, null);
       return;
     }
     
-    // Use /api/auth/me to verify existing session
     setBooting(true);
     api
       .get("/api/auth/me")
       .then((res) => {
-        setAuth(t, res.data.rider);
+        // Handle both response shapes: { rider: {...} } or flat { id, email, role }
+        const user = res.data.rider || res.data;
+        setAuth(t, user);
       })
       .catch((err) => {
-        console.error("Session verification failed:", err.message);
+        console.error("[API] Session verification failed:", err.message);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setAuth(null, null);

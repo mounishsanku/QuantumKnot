@@ -29,18 +29,14 @@ export default function Login() {
     try {
       const res = await api.post("/api/auth/login", data);
 
-      // 🔥 FIX: correct field
-      const token = res.data.accessToken;
+      // Extract token from response
+      const token = res.data.token || res.data.accessToken;
 
-      // 🔥 STORE TOKEN (CRITICAL)
+      // Store auth state
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // 🔥 ALSO UPDATE STORE (if needed)
       setAuth(token, res.data.user);
-
-      // 🔥 DEBUG (optional)
-      console.log("TOKEN SAVED:", token);
 
       toast.success("Welcome back!");
       navigate("/dashboard");

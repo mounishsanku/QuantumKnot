@@ -274,6 +274,20 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
           transactionId,
           triggerType,
         });
+        const reasons = [
+          `${triggerType.charAt(0).toUpperCase() + triggerType.slice(1)} exceeded threshold`,
+          "Location verified",
+          fraudScore < 70 ? "Low fraud risk" : "High fraud risk"
+        ];
+
+        io.to(`rider:${riderId}`).emit("trigger_update", {
+          triggerType,
+          city: zone || rider.city || "Global",
+          fraudScore,
+          amount: payoutAmount,
+          action: "Auto payout initiated",
+          reasons
+        });
       }
     } catch (e) {
       logger.error(`[trigger] Payout processing failed: ${e.message}`);

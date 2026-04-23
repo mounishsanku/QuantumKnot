@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import Navbar from "../components/Navbar.jsx";
 import PolicyCard from "../components/PolicyCard.jsx";
 import TriggerAlert from "../components/TriggerAlert.jsx";
+import DecisionPanel from "../components/DecisionPanel.jsx";
+import SystemLogs from "../components/SystemLogs.jsx";
 import { api } from "../utils/api.js";
 import { useStore } from "../store/useStore.js";
 
@@ -38,6 +40,8 @@ export default function Dashboard() {
   const [feed, setFeed] = useState([]);
   const [simulating, setSimulating] = useState(null); // null | "rainfall" | "heat" | "strike"
   const [simResult, setSimResult] = useState(null);
+  const [decision, setDecision] = useState(null);
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
     // 🛡️ Only fetch private data if token and rider are ready
@@ -56,7 +60,7 @@ export default function Dashboard() {
         setPolicy(pRes.data.policy);
         setClaims(cRes.data.claims || []);
       } catch (e) {
-        console.error("Dashboard private fetch error:", e.message);
+        console.error("[API] Dashboard fetch error:", e.message);
         toast.error(e.response?.data?.message || "Failed to load protected data");
       } finally {
         setLoading(false);
@@ -80,6 +84,16 @@ export default function Dashboard() {
         const newItem = { ...evt, id: `${evt.type}-${Date.now()}` };
         return [newItem, ...prev].slice(0, 10);
       });
+    });
+    socket.on("trigger_update", (data) => {
+      setDecision(data);
+      const time = new Date().toLocaleTimeString();
+      setLogs((prev) => [
+        `${time} | [TRIGGER] ${data.triggerType} detected in ${data.city}`,
+        `${time} | [FRAUD] Score ${data.fraudScore}`,
+        `${time} | [PAYOUT] ₹${data.amount} initiated`,
+        ...prev.slice(0, 20),
+      ]);
     });
 
     return () => {
@@ -132,6 +146,23 @@ export default function Dashboard() {
     }
   }, []);
 
+  const simulateBulk = async (count) => {
+    if (rider?.role !== "admin") return;
+    try {
+      setLogs(prev => [
+        `${new Date().toLocaleTimeString()} | [SIMULATION] Triggered for ${count} riders`,
+        ...prev
+      ]);
+      await api.post("/api/admin/simulate-bulk", {
+        count,
+        triggerType: "rainfall"
+      });
+    } catch (e) {
+      toast.error("Bulk simulation failed");
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     // 🌦️ Fetch Public Weather Data (No Auth Required)
     const city = rider?.city || "Hyderabad";
@@ -148,7 +179,7 @@ export default function Dashboard() {
           city: data.city || city 
         });
       } catch (err) {
-        console.error("Dashboard weather fetch error:", err.message);
+        console.error("[API] Weather fetch error:", err.message);
         setWeather({ temp: "--", desc: "Unavailable", city });
       } finally {
         setWeatherLoading(false);
@@ -459,6 +490,12 @@ export default function Dashboard() {
                   {simulating === t ? "Processing…" : `⚡ Simulate ${t.charAt(0).toUpperCase() + t.slice(1)}`}
                 </button>
               ))}
+              <button
+                onClick={() => simulateBulk(50)}
+                className="bg-red-500 hover:bg-red-600 transition-colors px-4 py-2 rounded-lg text-white font-bold text-sm ml-auto border border-red-400/50"
+              >
+                Simulate 50 Riders
+              </button>
             </div>
           ) : (
             <div className="p-6 rounded-xl border border-dashed border-white/10 text-center">
@@ -466,6 +503,14 @@ export default function Dashboard() {
             </div>
           )}
         </motion.section>
+
+        {/* ── Decision & Logs Panel ── */}
+        {(decision || logs.length > 0) && (
+          <div className="grid md:grid-cols-2 gap-4">
+            <DecisionPanel decision={decision} />
+            <SystemLogs logs={logs} />
+          </div>
+        )}
 
         {/* ── Activity Feed ── */}
         <motion.section

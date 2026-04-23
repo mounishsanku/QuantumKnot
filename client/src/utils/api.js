@@ -13,7 +13,7 @@ export const api = axios.create({
 let isRedirecting = false;
 
 // =========================
-// 🔥 REQUEST INTERCEPTOR
+// REQUEST INTERCEPTOR
 // =========================
 api.interceptors.request.use(
   (config) => {
@@ -21,11 +21,8 @@ api.interceptors.request.use(
 
     // Skip auth for public routes
     if (config.isPublic || config.url?.includes("/weather")) {
-      console.log("TOKEN: SKIPPING (Public Request)");
       return config;
     }
-
-    console.log("TOKEN:", token);
 
     // Attach token only if valid
     if (token && token !== "null" && token !== "undefined") {
@@ -38,7 +35,7 @@ api.interceptors.request.use(
 );
 
 // =========================
-// 🔥 RESPONSE INTERCEPTOR
+// RESPONSE INTERCEPTOR
 // =========================
 api.interceptors.response.use(
   (response) => response,
@@ -51,17 +48,14 @@ api.interceptors.response.use(
     const { status, data, config } = error.response;
     const url = config.url?.toLowerCase() || "";
 
-    // 🔒 Ignore public APIs
+    // Ignore public APIs
     if (url.includes("/weather") || url.includes("/health")) {
-      console.log(`[api] Ignoring ${status} for public route: ${url}`);
       return Promise.reject(error);
     }
 
-    // =========================
-    // 🔥 FIXED 401 LOGIC
-    // =========================
+    // 401 HANDLING
     if (status === 401) {
-      console.warn("401 received from:", url);
+      console.warn("[API] 401 received from:", url);
 
       // ❗ ONLY logout if it's auth-related
       if (url.includes("/auth")) {
@@ -79,21 +73,17 @@ api.interceptors.response.use(
         }
       } else {
         // ✅ DO NOT logout for normal API failures
-        console.warn("Ignoring 401 for non-auth route:", url);
+        console.warn("[API] Ignoring 401 for non-auth route:", url);
       }
     }
 
-    // =========================
-    // 🔥 403 (ADMIN BLOCK)
-    // =========================
+    // 403 HANDLING
     if (status === 403) {
-      console.warn("Forbidden:", data?.message || "Admin access required");
+      console.warn("[API] Forbidden:", data?.message || "Admin access required");
       toast.error(data?.message || "Access denied");
     }
 
-    // =========================
-    // 🔥 SERVER ERRORS
-    // =========================
+    // SERVER ERRORS
     if (status >= 500) {
       toast.error(data?.message || "Internal server error");
     }

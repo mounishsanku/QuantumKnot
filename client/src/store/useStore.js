@@ -51,7 +51,7 @@ export const useStore = create((set) => ({
     try {
       await api.post("/api/auth/logout");
     } catch (e) {
-      console.warn("Backend logout failed, clearing local state anyway.");
+      console.warn("[API] Backend logout failed, clearing local state anyway.");
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
