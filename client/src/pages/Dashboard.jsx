@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { io as socketIo } from "socket.io-client";
+import { createSocket, destroySocket } from "../utils/socket.js";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Area,
@@ -66,18 +66,10 @@ export default function Dashboard() {
   }, [token, rider]);
 
   useEffect(() => {
-    if (!token) {
-      console.log("Skipping socket connection (no token)");
-      return;
-    }
-    const socket = socketIo(API_BASE, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-    });
+    if (!token) return;
 
-    socket.on("connect_error", () => {
-      console.log("[SOCKET] Connection skipped or failed safely");
-    });
+    const socket = createSocket(token);
+    if (!socket) return;
 
     socket.on("payout:completed", () => {
       toast.success("Payout completed!");
@@ -89,7 +81,10 @@ export default function Dashboard() {
         return [newItem, ...prev].slice(0, 10);
       });
     });
-    return () => socket.disconnect();
+
+    return () => {
+      destroySocket();
+    };
   }, [token]);
 
   /* ── Trigger simulator ── */

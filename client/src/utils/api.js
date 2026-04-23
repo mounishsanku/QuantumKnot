@@ -101,10 +101,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// =========================
-// 🔌 SOCKET URL
-// =========================
-export function getSocketUrl() {
-  return baseURL.replace(/^http/, "ws");
-}
