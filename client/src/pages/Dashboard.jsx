@@ -43,6 +43,9 @@ export default function Dashboard() {
   const [simulating, setSimulating] = useState(null); // null | "rainfall" | "heat" | "strike"
   const [simResult, setSimResult] = useState(null);
   const [decision, setDecision] = useState(null);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = user?.role === "admin";
   const [logs, setLogs] = useState([]);
   const [cityStats, setCityStats] = useState({});
 
@@ -315,7 +318,9 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {!isAdmin && (
+          <>
+            <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: "This Week's Coverage", value: `₹${stats.coverage.toLocaleString("en-IN")}` },
             { label: "Weekly Premium", value: `₹${stats.premium.toLocaleString("en-IN")}` },
@@ -457,7 +462,11 @@ export default function Dashboard() {
             </motion.div>
           </motion.div>
         </div>
+        </>
+        )}
 
+        {isAdmin && (
+        <>
         {/* ── Trigger Simulator ── */}
         <motion.section
           initial={{ opacity: 0, y: 12 }}
@@ -607,7 +616,10 @@ export default function Dashboard() {
             )}
           </div>
         </motion.section>
+        </>
+        )}
 
+        {!isAdmin && (
         <section className="rounded-2xl border border-white/10 bg-[#1A1A1A]/80 backdrop-blur-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-white/10 font-semibold bg-[#1A1A1A]/80">
             Recent claims
@@ -686,6 +698,7 @@ export default function Dashboard() {
             </table>
           </div>
         </section>
+        )}
       </main>
     </div>
   );

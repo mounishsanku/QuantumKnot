@@ -136,11 +136,14 @@ export default function App() {
             path="/admin"
             element={
               <ProtectedRoute>
-                {rider?.role === "admin" ? (
-                  <PageWrapper><AdminDashboard /></PageWrapper>
-                ) : (
-                  <Navigate to="/dashboard" replace />
-                )}
+                {(() => {
+                  const user = JSON.parse(localStorage.getItem("user") || "{}");
+                  return user?.role === "admin" ? (
+                    <PageWrapper><AdminDashboard /></PageWrapper>
+                  ) : (
+                    <Navigate to="/dashboard" replace />
+                  );
+                })()}
               </ProtectedRoute>
             }
           />
