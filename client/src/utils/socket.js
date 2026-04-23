@@ -28,12 +28,11 @@ export function createSocket(token) {
 
   const socket = io(API_BASE, {
     transports: ["websocket"],
+    reconnection: true,
+    reconnectionAttempts: 5,
     auth: {
       token: localStorage.getItem("token"),
     },
-    reconnectionAttempts: 3,
-    reconnectionDelay: 2000,
-    timeout: 5000,
   });
 
   socket.on("connect", () => {

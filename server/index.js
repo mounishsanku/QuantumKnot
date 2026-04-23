@@ -58,14 +58,10 @@ const server = app.listen(PORT, () => {
 // ✅ SOCKET.IO
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://quantum-knot.vercel.app",
-      "https://quantum-knot-fsyedypzx-shankarbannu143-1339s-projects.vercel.app",
-    ],
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST"]
   },
+  transports: ["websocket", "polling"]
 });
 
 io.use((socket, next) => {

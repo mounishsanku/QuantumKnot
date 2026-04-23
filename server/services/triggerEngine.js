@@ -193,6 +193,22 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
       }
     };
 
+    const delay = async (ms) => {
+      if (process.env.DEMO_MODE === "true") {
+        await new Promise(r => setTimeout(r, 100));
+      } else {
+        await new Promise(r => setTimeout(r, ms));
+      }
+    };
+
+    if (io) {
+      io.emit("trigger_update", {
+        triggerType,
+        city: zone || rider.city || "Global",
+        status: "processing"
+      });
+    }
+
     safeNotify("trigger_detected");
     await delay(600);
 
@@ -280,12 +296,12 @@ export async function processTrigger(io, riderId, triggerType, triggerValue, zon
           fraudScore < 70 ? "Low fraud risk" : "High fraud risk"
         ];
 
-        io.to(`rider:${riderId}`).emit("trigger_update", {
+        io.emit("trigger_update", {
           triggerType,
           city: zone || rider.city || "Global",
           fraudScore,
           amount: payoutAmount,
-          action: "Auto payout initiated",
+          action: "payout completed",
           reasons
         });
       }

@@ -228,29 +228,26 @@ router.post("/simulate-bulk", async (req, res) => {
   try {
     const { count = 20, triggerType = "rainfall" } = req.body;
 
-    const riders = await Rider.find().limit(count);
+    // PART 6 - LIMIT BULK SIMULATION
+    const allRiders = await Rider.find().limit(20);
+    const riders = allRiders.slice(0, 20);
     const io = req.app.get("io");
 
-    const batchSize = 10;
-
-    for (let i = 0; i < riders.length; i += batchSize) {
-      const batch = riders.slice(i, i + batchSize);
-
-      await Promise.all(
-        batch.map((rider) =>
-          processTrigger(
-            io,
-            rider._id,
-            triggerType,
-            SIM_VALUES[triggerType] || "bulk_sim",
-            rider.city,
-            true // force simulation
-          ).catch((err) => {
-            console.log("[SIM] Failed for rider:", rider._id);
-          })
-        )
-      );
-    }
+    // PART 1 - PARALLEL PROCESSING
+    await Promise.all(
+      riders.map((rider) =>
+        processTrigger(
+          io,
+          rider._id,
+          triggerType,
+          SIM_VALUES[triggerType] || "bulk_sim",
+          rider.city,
+          true // force simulation
+        ).catch((err) => {
+          console.log("[SIM] Failed for rider:", rider._id);
+        })
+      )
+    );
 
     res.json({
       success: true,
