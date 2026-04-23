@@ -18,7 +18,8 @@ const cookieOptions = {
 const generateAccessToken = (rider) => {
   return jwt.sign(
     {
-      id: rider._id.toString(), // ✅ CRITICAL FIX
+      id: rider._id.toString(),
+      role: rider.role,
     },
     process.env.JWT_ACCESS_SECRET,
     { expiresIn: "15m" }
@@ -28,7 +29,8 @@ const generateAccessToken = (rider) => {
 const generateRefreshToken = (rider) => {
   return jwt.sign(
     {
-      id: rider._id.toString(), // ✅ CRITICAL FIX
+      id: rider._id.toString(),
+      role: rider.role,
     },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: "7d" }
@@ -67,8 +69,12 @@ export const login = async (req, res) => {
     delete riderObj.password;
 
     res.json({
-      accessToken,
-      rider: riderObj,
+      token: accessToken,
+      user: {
+        id: rider._id,
+        email: rider.email,
+        role: rider.role
+      }
     });
   } catch (err) {
     logger.error(`[auth] Login error: ${err.message}`);
@@ -188,7 +194,11 @@ export const getMe = async (req, res) => {
     const riderObj = rider.toObject();
     delete riderObj.password;
 
-    res.json({ rider: riderObj });
+    res.json({ 
+      id: rider._id,
+      email: rider.email,
+      role: rider.role
+    });
   } catch (err) {
     logger.error(`[auth] getMe error: ${err.message}`);
     res.status(500).json({ message: "Failed to fetch user" });

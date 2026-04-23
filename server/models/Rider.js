@@ -37,6 +37,7 @@ const riderSchema = new mongoose.Schema({
   },
   platforms: [{ type: String }],
   role: {
+    // Corrected role assignment
     type: String,
     enum: ["rider", "admin"],
     default: "rider",

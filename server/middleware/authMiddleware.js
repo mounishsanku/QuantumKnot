@@ -23,7 +23,7 @@ export const authMiddleware = async (req, res, next) => {
 
     req.user = {
       id: userId,
-      role: decoded.role || "rider", // 🔥 THIS LINE FIXES EVERYTHING
+      role: decoded.role,
     };
 
     next();
