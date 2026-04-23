@@ -69,8 +69,9 @@ export const login = async (req, res) => {
     delete riderObj.password;
 
     res.json({
+      success: true,
       token: accessToken,
-      user: {
+      rider: {
         id: rider._id,
         email: rider.email,
         role: rider.role

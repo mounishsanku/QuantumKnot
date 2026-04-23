@@ -9,6 +9,11 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+const token = localStorage.getItem("token");
+if (token) {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
 // Prevent multiple redirects
 let isRedirecting = false;
 
@@ -18,17 +23,9 @@ let isRedirecting = false;
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-
-    // Skip auth for public routes
-    if (config.isPublic || config.url?.includes("/weather")) {
-      return config;
-    }
-
-    // Attach token only if valid
-    if (token && token !== "null" && token !== "undefined") {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -81,6 +78,9 @@ api.interceptors.response.use(
     if (status === 403) {
       console.warn("[API] Forbidden:", data?.message || "Admin access required");
       toast.error(data?.message || "Access denied");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
 
     // SERVER ERRORS

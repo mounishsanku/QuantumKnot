@@ -34,9 +34,9 @@ export default function Login() {
 
       // Store auth state
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("user", JSON.stringify(res.data.rider));
 
-      setAuth(token, res.data.user);
+      setAuth(token, res.data.rider);
 
       toast.success("Welcome back!");
       navigate("/dashboard");
