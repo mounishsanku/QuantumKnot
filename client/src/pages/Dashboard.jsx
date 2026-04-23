@@ -16,6 +16,8 @@ import PolicyCard from "../components/PolicyCard.jsx";
 import TriggerAlert from "../components/TriggerAlert.jsx";
 import DecisionPanel from "../components/DecisionPanel.jsx";
 import SystemLogs from "../components/SystemLogs.jsx";
+import CityHeatmap from "../components/CityHeatmap.jsx";
+import StoryPanel from "../components/StoryPanel.jsx";
 import { api } from "../utils/api.js";
 import { useStore } from "../store/useStore.js";
 
@@ -42,6 +44,7 @@ export default function Dashboard() {
   const [simResult, setSimResult] = useState(null);
   const [decision, setDecision] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [cityStats, setCityStats] = useState({});
 
   useEffect(() => {
     // 🛡️ Only fetch private data if token and rider are ready
@@ -94,6 +97,10 @@ export default function Dashboard() {
         `${time} | [PAYOUT] ₹${data.amount} initiated`,
         ...prev.slice(0, 20),
       ]);
+      setCityStats(prev => ({
+        ...prev,
+        [data.city]: (prev[data.city] || 0) + 1
+      }));
     });
 
     return () => {
@@ -505,9 +512,11 @@ export default function Dashboard() {
         </motion.section>
 
         {/* ── Decision & Logs Panel ── */}
-        {(decision || logs.length > 0) && (
-          <div className="grid md:grid-cols-2 gap-4">
+        {(decision || logs.length > 0 || Object.keys(cityStats).length > 0) && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             <DecisionPanel decision={decision} />
+            <StoryPanel decision={decision} />
+            <CityHeatmap data={cityStats} />
             <SystemLogs logs={logs} />
           </div>
         )}
